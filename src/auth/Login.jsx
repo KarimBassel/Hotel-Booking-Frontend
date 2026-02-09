@@ -20,8 +20,17 @@ function Login() {
         { withCredentials: true }
       );
 
+      //Save JWT token to be used in subsequent requests
+      localStorage.setItem("token", res.data.jwtToken);
+
       console.log(res.data);
       setSuccess(true);
+
+      //Navigate to home page after successful login
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000);
+      
     } catch (err) {
       console.error("login error:", err);
       setError(err?.response?.data?.message || "Login failed");
@@ -45,6 +54,8 @@ function Login() {
       margin: 0,
       padding: 24,
       backgroundColor: "#ffffff",
+      position: "relative",
+      zIndex: 1000,
       border: "1px solid #e6eef8",
       borderRadius: 12,
       boxShadow: "0 8px 30px rgba(16,24,40,0.08)",

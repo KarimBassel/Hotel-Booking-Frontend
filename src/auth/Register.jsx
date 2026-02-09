@@ -25,7 +25,7 @@ function Register() {
 
       console.log(res.data);
       setSuccess(true);
-      // optionally reset fields
+      //Reset fields on refresh
       setName("");
       setEmail("");
       setPassword("");
@@ -195,6 +195,24 @@ function Register() {
               {loading ? "Creating..." : "Create account"}
             </button>
           </form>
+
+          <button
+            type="button"
+            onClick={() => (window.location.href = "/login")}
+            style={{
+              marginTop: 10,
+              width: "100%",
+              padding: "10px 12px",
+              borderRadius: 8,
+              border: "1px solid #e6eef8",
+              background: "#fff",
+              color: "#2563eb",
+              fontSize: 14,
+              cursor: "pointer",
+            }}
+          >
+            Back to login
+          </button>
 
           <div style={styles.meta}>
             {error && <div style={styles.error}>{error}</div>}
