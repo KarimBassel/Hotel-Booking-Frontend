@@ -48,7 +48,19 @@ const Hotels = () => {
               onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-5px)"}
               onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}
             >
-              <div style={styles.image}></div>
+              {hotel.image_url ? (
+                <img
+                  src={hotel.image_url}
+                  alt={hotel.name || "Hotel image"}
+                  style={styles.image}
+                  onError={(e) => {
+                    // hide broken image so placeholder shows (if any)
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+              ) : (
+                <div style={styles.image}></div>
+              )}
 
               <h3 style={styles.hotelName}>{hotel.name}</h3>
               <p style={styles.location}>{hotel.location}</p>
@@ -128,7 +140,10 @@ const styles = {
     fontSize: "14px",
     color: "#666",
     margin: "10px 0",
-    height: "40px",
+    // multiline truncation with ellipsis
+    display: "-webkit-box",
+    WebkitLineClamp: 3,
+    WebkitBoxOrient: "vertical",
     overflow: "hidden",
     textOverflow: "ellipsis",
   },

@@ -8,20 +8,33 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [debug, setDebug] = useState(null);
 
   const login = async () => {
     setError("");
     setSuccess(false);
     setLoading(true);
     try {
+      // debug: record outgoing request (without password)
+      setDebug({ request: { email } });
+      console.log("login: sending", { email });
       const res = await api.post(
         "/api/auth/login",
         { email, password },
         { withCredentials: true }
       );
 
+      // debug: save response
+      console.log("login response:", res);
+      setDebug((d) => ({ ...(d || {}), response: { data: res.data, status: res.status } }));
       //Save JWT token to be used in subsequent requests
-      localStorage.setItem("token", res.data.jwtToken);
+      const token = res.data?.jwtToken || res.data?.token || res.data?.accessToken || res.data?.access_token;
+      if (token) localStorage.setItem("token", token);
+
+      // Save user id if provided by backend (common response shapes)
+      // backend returns user_id (snake_case) in AuthLoginResponse
+      const userId = res.data?.user_id || res.data?.user?.id || res.data?.userId || res.data?.id || res.data?.data?.userId || res.data?.data?.id;
+      if (userId) localStorage.setItem("userId", String(userId));
 
       console.log(res.data);
       setSuccess(true);
@@ -30,9 +43,11 @@ function Login() {
       setTimeout(() => {
         window.location.href = "/";
       }, 1000);
-      
+
     } catch (err) {
       console.error("login error:", err);
+      // capture error details for debugging (don't store sensitive full error)
+      setDebug((d) => ({ ...(d || {}), error: err?.response?.data || err?.message }));
       setError(err?.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
@@ -188,6 +203,12 @@ function Login() {
           <div style={styles.meta}>
             {error && <div style={styles.error}>{error}</div>}
             {success && <div style={styles.success}>Login successful.</div>}
+            {debug && (
+              <div style={{ marginTop: 12 }}>
+                <strong style={{ display: 'block', marginBottom: 6 }}>Debug</strong>
+                <pre style={{ background: '#f8fafc', padding: 8, borderRadius: 6, overflowX: 'auto' }}>{JSON.stringify(debug, null, 2)}</pre>
+              </div>
+            )}
           </div>
         </div>
       </div>
