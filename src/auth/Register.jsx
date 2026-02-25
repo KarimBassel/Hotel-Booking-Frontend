@@ -110,8 +110,9 @@ function Register() {
           alignItems: "center",
           justifyContent: "center",
           padding: 16,
-          width: "100vw",
+          width: "100%",
           background: "#f3f4f6",
+          boxSizing: "border-box",
         }}
       >
         <div style={styles.container}>
