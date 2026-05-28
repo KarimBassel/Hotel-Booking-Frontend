@@ -58,7 +58,7 @@ const NavBar = () => {
               Bookings
             </Link>
 
-            <Link style={linkStyle("/profile")} to="/profile">
+            <Link style={linkStyle("/profile")} to="/UserProfile">
               Profile
             </Link>
 

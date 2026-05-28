@@ -116,7 +116,7 @@ const HotelDetails = () => {
                   disabled={room.availiability === false}
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate('/bookingdetails', { state: { hotelId: hotel.id, roomId: room.id } });
+                    navigate('/bookingdetails', { state: { hotel, room } });
                   }}
                 >
                   {room.availiability === false ? 'Unavailable' : 'Book'}

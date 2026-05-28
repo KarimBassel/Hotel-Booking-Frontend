@@ -1,50 +1,64 @@
 import { useEffect, useState } from "react";
-import { getBookings, cancelBooking } from "../api/bookingsApi";
+import { useNavigate } from "react-router-dom";
+import { getBookings, updateBooking } from "../api/bookingsApi";
 import colors from "../styles/colors";
 
 const Bookings = () => {
+  const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [debug, setDebug] = useState(null);
 
   useEffect(() => {
-    // try to load bookings for current user if user id is available in localStorage
-    const userId = localStorage.getItem('userId');
+    const userId = localStorage.getItem("userId");
     loadBookings(userId);
   }, []);
 
   const loadBookings = async (userId) => {
     try {
-      console.log("loadBookings: userId=", userId);
       const res = await getBookings(userId);
-      console.log("loadBookings: response", res);
-      setDebug({ request: { userId }, response: res?.data, status: res?.status, headers: res?.headers });
       setBookings(res.data);
     } catch (err) {
       console.error(err);
-      setDebug({ request: { userId }, error: err?.response || err?.message || err });
-      setError("Could not load bookings.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancel = async (id) => {
+  const handleCancel = async (booking) => {
+    if (booking.status === "CONFIRMED") {
+      alert("Confirmed bookings cannot be cancelled.");
+      return;
+    }
+
     try {
-      console.log("cancelBooking: id=", id);
-      await cancelBooking(id);
-      console.log("cancelBooking: success", id);
-      setBookings((prev) => prev.filter((b) => b.bookingID !== id));
+      await updateBooking(booking.bookingID , "CANCELLED");
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.bookingID === booking.bookingID
+            ? { ...b, status: "CANCELLED" }
+            : b
+        )
+      );
     } catch (err) {
       console.error(err);
-      setDebug((d) => ({ ...(d||{}), cancelError: err?.response || err?.message || err }));
-      alert("Failed to cancel booking");
+      alert("Failed to cancel booking.");
     }
   };
 
-  if (loading) return <p style={styles.center}>Loading bookings...</p>;
-  if (error) return <p style={styles.center}>{error}</p>;
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case "CONFIRMED":
+        return { background: "#dcfce7", color: "#166534" };
+      case "PENDING":
+        return { background: "#fef9c3", color: "#854d0e" };
+      case "CANCELLED":
+        return { background: "#fee2e2", color: "#991b1b" };
+      default:
+        return {};
+    }
+  };
+
+  if (loading) return <p style={styles.center}>Loading...</p>;
 
   return (
     <div style={styles.container}>
@@ -56,37 +70,61 @@ const Bookings = () => {
         <div style={styles.list}>
           {bookings.map((b) => (
             <div key={b.bookingID} style={styles.card}>
-              <div style={styles.cardHeader}>
+              <div style={styles.topRow}>
                 <div>
-                  <div style={styles.hotelName}>{b.hotelName}</div>
-                  <div style={styles.roomInfo}>Room {b.rommNumber}</div>
+                  <h3 style={styles.hotel}>{b.hotelName}</h3>
+                  <p style={styles.room}>Room {b.rommNumber}</p>
                 </div>
-                <div style={{ textAlign: "right" }}>
-                  <div style={styles.total}>${b.totalPayment}</div>
-                  <div style={styles.status}>{b.status}</div>
-                </div>
+
+                <span
+                  style={{
+                    ...styles.status,
+                    ...getStatusStyle(b.status),
+                  }}
+                >
+                  {b.status}
+                </span>
               </div>
 
-              <div style={styles.dates}>
-                <div>Check-in: {new Date(b.CheckIn).toLocaleDateString()}</div>
-                <div>Check-out: {new Date(b.CheckOut).toLocaleDateString()}</div>
+              <div style={styles.middleRow}>
+                <div>
+                  <div>
+                    Check-in:{" "}
+                    {new Date(b.CheckIn).toLocaleDateString()}
+                  </div>
+                  <div>
+                    Check-out:{" "}
+                    {new Date(b.CheckOut).toLocaleDateString()}
+                  </div>
+                </div>
+
+                <div style={styles.price}>${b.totalPayment}</div>
               </div>
 
               <div style={styles.actions}>
-                <button style={styles.cancelButton} onClick={() => handleCancel(b.bookingID)}>
-                  Cancel
+                <button
+                  style={styles.detailsButton}
+                  onClick={() =>
+                    navigate("/bookingdetails", {
+                      state: { booking: b, fromBookings: true },
+                    })
+                  }
+                >
+                  View Details
                 </button>
+
+                {b.status !== "CONFIRMED" &&
+                  b.status !== "CANCELLED" && (
+                    <button
+                      style={styles.cancelButton}
+                      onClick={() => handleCancel(b)}
+                    >
+                      Cancel
+                    </button>
+                  )}
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {/* Debug panel - shown when debug info exists */}
-      {debug && (
-        <div style={{ marginTop: 20 }}>
-          <h3 style={{ marginBottom: 8 }}>Debug info</h3>
-          <pre style={{ background: '#f8fafc', padding: 12, borderRadius: 8, overflowX: 'auto' }}>{JSON.stringify(debug, null, 2)}</pre>
         </div>
       )}
     </div>
@@ -94,19 +132,78 @@ const Bookings = () => {
 };
 
 const styles = {
-  container: { padding: 24, maxWidth: 980, margin: "18px auto", fontFamily: "Arial, sans-serif" },
-  center: { textAlign: "center", marginTop: 40, color: "#374151" },
-  title: { marginBottom: 16, color: colors.textDark },
-  list: { display: "grid", gap: 12 },
-  card: { padding: 16, borderRadius: 10, background: "#fff", boxShadow: "0 8px 30px rgba(16,24,40,0.04)" },
-  cardHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
-  hotelName: { fontWeight: 700 },
-  roomInfo: { color: "#6b7280" },
-  total: { fontWeight: 700, color: colors.primary },
-  status: { color: colors.accent },
-  dates: { color: "#4b5563", marginBottom: 8 },
-  actions: { display: "flex", gap: 8 },
-  cancelButton: { background: "#ef4444", color: "#fff", border: "none", padding: "8px 10px", borderRadius: 8, cursor: "pointer" },
+  container: {
+    maxWidth: 900,
+    margin: "40px auto",
+    padding: 20,
+    fontFamily: "Arial",
+  },
+  title: {
+    marginBottom: 20,
+    color: colors.textDark,
+  },
+  center: {
+    textAlign: "center",
+  },
+  list: {
+    display: "grid",
+    gap: 16,
+  },
+  card: {
+    background: "#fff",
+    padding: 20,
+    borderRadius: 12,
+    boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
+  },
+  topRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  hotel: {
+    margin: 0,
+  },
+  room: {
+    margin: 0,
+    color: "#6b7280",
+  },
+  status: {
+    padding: "6px 14px",
+    borderRadius: 20,
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  middleRow: {
+    marginTop: 15,
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  price: {
+    fontWeight: "700",
+    color: colors.primary,
+  },
+  actions: {
+    marginTop: 15,
+    display: "flex",
+    gap: 10,
+  },
+  detailsButton: {
+    background: colors.primary,
+    color: "#fff",
+    border: "none",
+    padding: "8px 14px",
+    borderRadius: 8,
+    cursor: "pointer",
+  },
+  cancelButton: {
+    background: "#ef4444",
+    color: "#fff",
+    border: "none",
+    padding: "8px 14px",
+    borderRadius: 8,
+    cursor: "pointer",
+  },
 };
 
 export default Bookings;

@@ -5,9 +5,12 @@ import Register from "./auth/Register";
 import Hotels from "./pages/Hotels";
 import HotelDetails from "./pages/HotelDetails";
 import Bookings from "./pages/Bookings";
+import BookingDetails from "./pages/BookingDetails";
+import StripeCheckout from "./pages/StripeCheckout";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import NavBar from "./components/NavBar";
+import Profile from "./pages/UserProfile";
 
 function App() {
   const location = useLocation();
@@ -30,7 +33,9 @@ function App() {
         <Route path="/hotels" element={<Hotels />} />
         <Route path="/hotels/:id" element={<HotelDetails />} />
         <Route path="/bookings" element={<Bookings />} />
-        <Route path="/bookingdetails" element={<Bookings />} />
+        <Route path="/bookingdetails" element={<BookingDetails />} />
+        <Route path="/stripe-checkout" element={<StripeCheckout />} />
+        <Route path="/UserProfile" element={<Profile />} />
       </Route>
 
       {/* Fallback */}

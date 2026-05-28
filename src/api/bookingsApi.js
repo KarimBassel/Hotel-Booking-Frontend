@@ -8,4 +8,10 @@ export const getBookings = (userId) => {
 
 export const createBooking = (payload) => api.post("/api/bookings", payload, { withCredentials: true });
 
-export const cancelBooking = (bookingId) => api.delete(`/api/bookings/${bookingId}`);
+export const updateBooking = (bookingId, status) => api.put(`/api/bookings/${bookingId}`, status);
+
+
+export const checkRoomAvailability = (roomId, checkIn, checkOut) => {
+  const path = `/api/bookings/check-availability?roomId=${roomId}&checkIn=${checkIn}&checkOut=${checkOut}`;
+  return api.get(path);
+};
