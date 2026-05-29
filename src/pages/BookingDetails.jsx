@@ -37,7 +37,7 @@ useEffect(() => {
       setValidWindow(true);
     }
 
-    if(booking?.status && booking.status === "PENDING"){
+    if(booking?.status && booking?.status === "PENDING"){
       setValidWindow(true);
       setEmptyWindow(true);
       setValidityJustification("This booking is currently pending. You can proceed to payment or modify the dates.");
@@ -47,7 +47,7 @@ useEffect(() => {
       //console.log("ROOM OBJECT:", room);
       const response =
         await checkRoomAvailability(
-          room.id,
+          room?.id,
           checkInDate,
           checkOutDate
         );
@@ -293,7 +293,7 @@ useEffect(() => {
           </button>
           )}
 
-          {(checkInDate && checkOutDate && !ValidWindow && (booking.status !== "CONFIRMED" && booking.status !== "CANCELLED") && (
+          {(checkInDate && checkOutDate && !ValidWindow && (booking?.status !== "CONFIRMED" && booking?.status !== "CANCELLED") && (
             <div style={{ marginTop: 16, color: "#ef4444", fontWeight: "500" }}>
               Check-out date must be after check-in date.
               Dates must be in the future.

@@ -1,28 +1,43 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getBookings, updateBooking } from "../api/bookingsApi";
+
+import {
+  getBookings,
+  updateBooking,
+} from "../api/bookingsApi";
+
+import { getUserHotelReview } from "../api/reviewApi";
+
 import colors from "../styles/colors";
 
 const Bookings = () => {
   const navigate = useNavigate();
+
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     const userId = localStorage.getItem("userId");
-    loadBookings(userId);
+
+    if (userId) {
+      loadBookings(userId);
+    }
   }, []);
 
   const loadBookings = async (userId) => {
     try {
       const res = await getBookings(userId);
       setBookings(res.data);
+
     } catch (err) {
-      console.error(err);
+      console.error("LOAD BOOKINGS ERROR:", err);
+
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleCancel = async (booking) => {
     if (booking.status === "CONFIRMED") {
@@ -31,7 +46,11 @@ const Bookings = () => {
     }
 
     try {
-      await updateBooking(booking.bookingID , "CANCELLED");
+      await updateBooking(
+        booking.bookingID,
+        "CANCELLED"
+      );
+
       setBookings((prev) =>
         prev.map((b) =>
           b.bookingID === booking.bookingID
@@ -39,89 +58,223 @@ const Bookings = () => {
             : b
         )
       );
+
     } catch (err) {
-      console.error(err);
+      console.error("CANCEL BOOKING ERROR:", err);
       alert("Failed to cancel booking.");
     }
   };
 
+
+  const canReview = (booking) => {
+    return (
+      booking.status === "CONFIRMED" &&
+      new Date(booking.CheckOut).getTime() <
+        Date.now()
+    );
+  };
+
+  const handleReviewNavigation = async (
+    booking
+  ) => {
+    try {
+      const res = await getUserHotelReview(
+        booking.HotelID
+      );
+
+      console.log(
+        "REVIEW RESPONSE:",
+        res.data
+      );
+
+      // Existing review
+      navigate("/review-visit", {
+        state: {
+          booking,
+          review: res.data,
+        },
+      });
+
+    } catch (err) {
+
+      console.error(
+        "GET REVIEW ERROR:",
+        err
+      );
+
+      // No review exists yet
+      if (err.response?.status === 404) {
+        navigate("/review-visit", {
+          state: {
+            booking,
+          },
+        });
+
+        return;
+      }
+
+      alert("Failed to load review.");
+    }
+  };
+
+
   const getStatusStyle = (status) => {
     switch (status) {
+
       case "CONFIRMED":
-        return { background: "#dcfce7", color: "#166534" };
+        return {
+          background: "#dcfce7",
+          color: "#166534",
+        };
+
       case "PENDING":
-        return { background: "#fef9c3", color: "#854d0e" };
+        return {
+          background: "#fef9c3",
+          color: "#854d0e",
+        };
+
       case "CANCELLED":
-        return { background: "#fee2e2", color: "#991b1b" };
+        return {
+          background: "#fee2e2",
+          color: "#991b1b",
+        };
+
       default:
         return {};
     }
   };
 
-  if (loading) return <p style={styles.center}>Loading...</p>;
+
+  if (loading) {
+    return (
+      <p style={styles.center}>
+        Loading...
+      </p>
+    );
+  }
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>My Bookings</h1>
+      <h1 style={styles.title}>
+        My Bookings
+      </h1>
 
       {bookings.length === 0 ? (
-        <p style={styles.center}>You have no bookings.</p>
+        <p style={styles.center}>
+          You have no bookings.
+        </p>
       ) : (
         <div style={styles.list}>
-          {bookings.map((b) => (
-            <div key={b.bookingID} style={styles.card}>
+          {bookings.map((booking) => (
+            <div
+              key={booking.bookingID}
+              style={styles.card}
+            >
+              {/* TOP */}
               <div style={styles.topRow}>
                 <div>
-                  <h3 style={styles.hotel}>{b.hotelName}</h3>
-                  <p style={styles.room}>Room {b.rommNumber}</p>
+                  <h3 style={styles.hotel}>
+                    {booking.hotelName}
+                  </h3>
+
+                  <p style={styles.room}>
+                    Room {booking.roomNumber}
+                  </p>
                 </div>
 
                 <span
                   style={{
                     ...styles.status,
-                    ...getStatusStyle(b.status),
+                    ...getStatusStyle(
+                      booking.status
+                    ),
                   }}
                 >
-                  {b.status}
+                  {booking.status}
                 </span>
               </div>
 
+              {/* MIDDLE */}
               <div style={styles.middleRow}>
                 <div>
                   <div>
                     Check-in:{" "}
-                    {new Date(b.CheckIn).toLocaleDateString()}
+                    {new Date(
+                      booking.CheckIn
+                    ).toLocaleDateString()}
                   </div>
+
                   <div>
                     Check-out:{" "}
-                    {new Date(b.CheckOut).toLocaleDateString()}
+                    {new Date(
+                      booking.CheckOut
+                    ).toLocaleDateString()}
                   </div>
                 </div>
 
-                <div style={styles.price}>${b.totalPayment}</div>
+                <div style={styles.price}>
+                  $
+                  {booking.totalPayment}
+                </div>
               </div>
 
+              {/* ACTIONS */}
               <div style={styles.actions}>
+
+                {/* DETAILS */}
                 <button
-                  style={styles.detailsButton}
+                  style={
+                    styles.detailsButton
+                  }
                   onClick={() =>
-                    navigate("/bookingdetails", {
-                      state: { booking: b, fromBookings: true },
-                    })
+                    navigate(
+                      "/bookingdetails",
+                      {
+                        state: {
+                          booking,
+                          fromBookings: true,
+                        },
+                      }
+                    )
                   }
                 >
                   View Details
                 </button>
 
-                {b.status !== "CONFIRMED" &&
-                  b.status !== "CANCELLED" && (
+                {/* CANCEL */}
+                {booking.status !==
+                  "CONFIRMED" &&
+                  booking.status !==
+                    "CANCELLED" && (
                     <button
-                      style={styles.cancelButton}
-                      onClick={() => handleCancel(b)}
+                      style={
+                        styles.cancelButton
+                      }
+                      onClick={() =>
+                        handleCancel(
+                          booking
+                        )
+                      }
                     >
                       Cancel
                     </button>
                   )}
+
+                {/* REVIEW */}
+                {canReview(booking) && (
+                  <button
+                    style={
+                      styles.reviewButton
+                    }
+                    onClick={() =>
+                      handleReviewNavigation(
+                        booking
+                      )
+                    }
+                  >
+                    Review Visit
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -131,6 +284,7 @@ const Bookings = () => {
   );
 };
 
+
 const styles = {
   container: {
     maxWidth: 900,
@@ -138,56 +292,70 @@ const styles = {
     padding: 20,
     fontFamily: "Arial",
   },
+
   title: {
     marginBottom: 20,
     color: colors.textDark,
   },
+
   center: {
     textAlign: "center",
   },
+
   list: {
     display: "grid",
     gap: 16,
   },
+
   card: {
     background: "#fff",
     padding: 20,
     borderRadius: 12,
-    boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
+    boxShadow:
+      "0 10px 30px rgba(0,0,0,0.05)",
   },
+
   topRow: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
   },
+
   hotel: {
     margin: 0,
   },
+
   room: {
     margin: 0,
     color: "#6b7280",
   },
+
   status: {
     padding: "6px 14px",
     borderRadius: 20,
     fontSize: 12,
     fontWeight: "600",
   },
+
   middleRow: {
     marginTop: 15,
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent:
+      "space-between",
     alignItems: "center",
   },
+
   price: {
     fontWeight: "700",
     color: colors.primary,
   },
+
   actions: {
     marginTop: 15,
     display: "flex",
     gap: 10,
   },
+
   detailsButton: {
     background: colors.primary,
     color: "#fff",
@@ -196,8 +364,18 @@ const styles = {
     borderRadius: 8,
     cursor: "pointer",
   },
+
   cancelButton: {
     background: "#ef4444",
+    color: "#fff",
+    border: "none",
+    padding: "8px 14px",
+    borderRadius: 8,
+    cursor: "pointer",
+  },
+
+  reviewButton: {
+    background: "#ca8a04",
     color: "#fff",
     border: "none",
     padding: "8px 14px",

@@ -61,6 +61,9 @@ const NavBar = () => {
             <Link style={linkStyle("/profile")} to="/UserProfile">
               Profile
             </Link>
+            <Link style={linkStyle("/reviews")} to="/UserReviews">
+              Reviews
+            </Link>
 
             {isAdmin && (
               <>

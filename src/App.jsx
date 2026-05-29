@@ -11,6 +11,8 @@ import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import NavBar from "./components/NavBar";
 import Profile from "./pages/UserProfile";
+import UserReviews from "./pages/UserReviews";
+import ReviewVisit from "./pages/ReviewVisit";
 
 function App() {
   const location = useLocation();
@@ -36,6 +38,8 @@ function App() {
         <Route path="/bookingdetails" element={<BookingDetails />} />
         <Route path="/stripe-checkout" element={<StripeCheckout />} />
         <Route path="/UserProfile" element={<Profile />} />
+        <Route path="/UserReviews" element={<UserReviews/>} />
+        <Route path="/review-visit" element={<ReviewVisit />} />
       </Route>
 
       {/* Fallback */}
