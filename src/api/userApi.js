@@ -6,3 +6,9 @@ export const getProfile = () =>
 
 export const updateProfile = (payload) =>
   api.put("/api/users", payload, { withCredentials: true });
+
+export const getAllUsers = () =>
+  api.get("/api/users", { withCredentials: true });
+
+export const updateUserStatus = (userID, payload) =>
+  api.put(`/api/users/status/${userID}`, payload, { withCredentials: true });

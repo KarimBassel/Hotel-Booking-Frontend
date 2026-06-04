@@ -13,6 +13,13 @@ import NavBar from "./components/NavBar";
 import Profile from "./pages/UserProfile";
 import UserReviews from "./pages/UserReviews";
 import ReviewVisit from "./pages/ReviewVisit";
+import ManageHotels from "./pages/admin/ManageHotels";
+import HotelFormPage from "./pages/admin/HotelFormPage";
+import ManageRooms from "./pages/admin/ManageRooms";
+import RoomFormPage from "./pages/admin/RoomFormPage";
+import ManageBookings from "./pages/admin/ManageBookings";
+import ManageReviews from "./pages/admin/ManageReviews";
+import ManageUsers from "./pages/admin/ManageUsers";
 
 function App() {
   const location = useLocation();
@@ -40,6 +47,15 @@ function App() {
         <Route path="/UserProfile" element={<Profile />} />
         <Route path="/UserReviews" element={<UserReviews/>} />
         <Route path="/review-visit" element={<ReviewVisit />} />
+        <Route path="/admin/hotels" element={<ManageHotels />} />
+        <Route path="/admin/add-hotel" element={<HotelFormPage  />} />
+        <Route path="/admin/edit-hotel/:id" element={<HotelFormPage  />} />
+        <Route path="/admin/rooms" element={<ManageRooms  />} />
+        <Route path="/admin/add-room" element={<RoomFormPage  />} />
+        <Route path="/admin/edit-room/:id" element={<RoomFormPage  />} />
+        <Route path="/admin/bookings" element={<ManageBookings  />} />
+        <Route path="/admin/reviews" element={<ManageReviews  />} />
+        <Route path="/admin/users" element={<ManageUsers  />} />
       </Route>
 
       {/* Fallback */}

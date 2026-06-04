@@ -71,7 +71,10 @@ const CheckoutForm = () => {
         setSuccess(true);
 
         try {
-          await updateBooking(bookingId, "CONFIRMED");
+          const payload = {
+            status: "CONFIRMED",
+          }
+          await updateBooking(bookingId, payload);
         } catch (err) {
           console.error("Failed to update booking:", err);
         }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getProfile } from "../api/userApi";
+import { getProfile,updateProfile } from "../api/userApi";
 import { uploadImage, deleteImage } from "../api/CloudinaryApi";
 import api from "../api/axios";
 
@@ -17,7 +17,7 @@ const Profile = () => {
   const [message, setMessage] = useState("");
   const [debug, setDebug] = useState(null);
 
-  // ---------------- LOAD PROFILE ----------------
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -44,12 +44,12 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
-  // ---------------- INPUT CHANGE ----------------
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ---------------- IMAGE HANDLING ----------------
+ 
   const uploadImageIfNew = async () => {
     const isNewImageSelected = !!file;
 
@@ -81,7 +81,6 @@ const Profile = () => {
     }
   };
 
-  // ---------------- UPDATE PROFILE ----------------
   const handleUpdate = async () => {
     setUpdating(true);
     setMessage("");
@@ -94,12 +93,12 @@ const Profile = () => {
         imageURL,
       };
 
-      const res = await api.put("/api/users/profile", payload);
+      const res = await updateProfile(payload);
 
       setForm(payload);
       setFile(null);
 
-      setMessage("Profile updated successfully ✅");
+      setMessage("Profile updated successfully");
 
       setDebug((prev) => ({
         ...prev,
@@ -107,7 +106,7 @@ const Profile = () => {
       }));
     } catch (err) {
       console.error(err);
-      setMessage("Update failed ❌");
+      setMessage("Update failed");
 
       setDebug((prev) => ({
         ...prev,
@@ -201,7 +200,6 @@ const Profile = () => {
 
 export default Profile;
 
-/* ---------------- STYLES ---------------- */
 
 const styles = {
   container: {

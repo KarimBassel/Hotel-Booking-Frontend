@@ -17,12 +17,9 @@ const NavBar = () => {
       const decoded = jwtDecode(token);
       isLoggedIn = true;
 
-      if (decoded.role) {
-        isAdmin = decoded.role === "ADMIN";
-      } else if (decoded.roles) {
-        isAdmin = decoded.roles.includes("ADMIN");
-      }
-    } catch (error) {
+      const role = decoded.role || decoded.roles?.[0];
+      isAdmin = role === "ADMIN";
+    } catch (e) {
       console.log("Invalid token");
     }
   }
@@ -33,8 +30,7 @@ const NavBar = () => {
   };
 
   const isActive = (path) =>
-    location.pathname === path ||
-    location.pathname.startsWith(path + "/");
+    location.pathname === path || location.pathname.startsWith(path + "/");
 
   const linkStyle = (path) => ({
     ...styles.link,
@@ -43,56 +39,63 @@ const NavBar = () => {
 
   return (
     <nav style={styles.nav}>
+      {/* LOGO */}
       <div style={styles.logoContainer} onClick={() => navigate("/")}>
-        <img src={logoImg} alt="Logo" style={styles.logoImage} />
+        <img src={logoImg} alt="logo" style={styles.logoImage} />
         <span style={styles.logoText}>HotelBooking</span>
       </div>
 
+      {/* LINKS */}
       <div style={styles.links}>
         <Link style={linkStyle("/")} to="/">Home</Link>
-        <Link style={linkStyle("/hotels")} to="/hotels">Hotels</Link>
-
-        {isLoggedIn && (
+        {/* USER */}
+        {isLoggedIn && !isAdmin && (
           <>
+            <Link style={linkStyle("/hotels")} to="/hotels">Hotels</Link>
             <Link style={linkStyle("/bookings")} to="/bookings">
               Bookings
             </Link>
-
-            <Link style={linkStyle("/profile")} to="/UserProfile">
+            <Link style={linkStyle("/UserProfile")} to="/UserProfile">
               Profile
             </Link>
-            <Link style={linkStyle("/reviews")} to="/UserReviews">
+            <Link style={linkStyle("/UserReviews")} to="/UserReviews">
               Reviews
             </Link>
-
-            {isAdmin && (
-              <>
-                <Link style={linkStyle("/admin/add-hotel")} to="/admin/add-hotel">
-                  Add Hotel
-                </Link>
-                <Link style={linkStyle("/admin/add-room")} to="/admin/add-room">
-                  Add Room
-                </Link>
-                <Link style={linkStyle("/admin/bookings")} to="/admin/bookings">
-                  Manage Bookings
-                </Link>
-              </>
-            )}
-
-            <button style={styles.logoutBtn} onClick={handleLogout}>
-              Logout
-            </button>
+          </>
+        )}
+        {/* ADMIN */}
+        {isLoggedIn && isAdmin && (
+          <>
+            <Link style={linkStyle("/admin/hotels")} to="/admin/hotels">
+              Hotels
+            </Link>
+            <Link style={linkStyle("/admin/rooms")} to="/admin/rooms">
+              Rooms
+            </Link>
+            <Link style={linkStyle("/admin/bookings")} to="/admin/bookings">
+              Bookings
+            </Link>
+            <Link style={linkStyle("/admin/reviews")} to="/admin/reviews">
+              Reviews
+            </Link>
+            <Link style={linkStyle("/admin/users")} to="/admin/users">
+              Users
+            </Link>
+            <Link style={linkStyle("/UserProfile")} to="/UserProfile">
+              Profile
+            </Link>
           </>
         )}
 
-        {!isLoggedIn && (
+        {/* AUTH */}
+        {isLoggedIn ? (
+          <button style={styles.logoutBtn} onClick={handleLogout}>
+            Logout
+          </button>
+        ) : (
           <>
-            <Link style={linkStyle("/login")} to="/login">
-              Login
-            </Link>
-            <Link style={linkStyle("/register")} to="/register">
-              Register
-            </Link>
+            <Link style={linkStyle("/login")} to="/login">Login</Link>
+            <Link style={linkStyle("/register")} to="/register">Register</Link>
           </>
         )}
       </div>
@@ -105,54 +108,61 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "10px 30px",
-    backgroundColor: "#1e3a8a", // 🔵 YOUR ORIGINAL BLUE
+    padding: "12px 28px",
+    backgroundColor: "#1e3a8a",
     color: "#facc15",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
     position: "sticky",
     top: 0,
     zIndex: 100,
+    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+    flexWrap: "wrap",
   },
+
   logoContainer: {
     display: "flex",
     alignItems: "center",
-    cursor: "pointer",
     gap: "10px",
+    cursor: "pointer",
   },
+
   logoImage: {
     width: "40px",
     height: "40px",
     borderRadius: "8px",
-    objectFit: "cover",
   },
+
   logoText: {
     fontSize: "20px",
-    fontWeight: "bold",
-    color: "#facc15", // 🟡 GOLD
+    fontWeight: "700",
   },
+
   links: {
     display: "flex",
     alignItems: "center",
-    gap: "15px",
+    gap: "14px",
+    flexWrap: "wrap",
   },
+
   link: {
-    color: "#facc15", // 🟡 GOLD
+    color: "#facc15",
     textDecoration: "none",
     fontWeight: "500",
-    transition: "0.2s ease",
-  },
-  activeLink: {
-    textDecoration: "underline",
-    color: "#ffffff",
-  },
-  logoutBtn: {
-    backgroundColor: "#f59e0b", // 🟠 GOLD BUTTON
-    border: "none",
-    padding: "6px 12px",
+    padding: "6px 8px",
     borderRadius: "6px",
-    color: "#1e3a8a",
+  },
+
+  activeLink: {
+    color: "#fff",
+    backgroundColor: "rgba(255,255,255,0.15)",
+  },
+
+  logoutBtn: {
+    backgroundColor: "#f59e0b",
+    border: "none",
+    padding: "7px 14px",
+    borderRadius: "8px",
     cursor: "pointer",
-    fontWeight: "500",
+    fontWeight: "600",
   },
 };
 

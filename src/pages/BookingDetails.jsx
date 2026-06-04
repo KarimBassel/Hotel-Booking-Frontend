@@ -153,10 +153,10 @@ useEffect(() => {
         const checkOut = bookingRes.data?.CheckOut ;
         totalPrice = nights * roomPrice;
 
-        navigate("/stripe-checkout", {
-          state: {
-            booking,
-          },
+      navigate("/stripe-checkout", {
+        state: {
+          booking: bookingRes.data,
+        },
         });
       }
     } catch (err) {

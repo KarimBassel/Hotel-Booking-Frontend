@@ -17,3 +17,11 @@ export const getHotelReviews = (hotelId) => {
 export const getUserReviews = () => {
     return api.get("/api/reviews/me", { withCredentials: true });
 }
+
+export const getAllReviews = () => {
+    return api.get("/api/reviews" , { withCredentials: true });
+}
+
+export const deleteReview = (reviewId) => {
+    return api.delete(`/api/reviews/${reviewId}`, { withCredentials: true });
+}
