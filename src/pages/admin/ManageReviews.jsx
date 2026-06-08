@@ -3,11 +3,52 @@ import {
   getAllReviews,
   deleteReview,
 } from "../../api/reviewApi";
+import AdminFilters from "../../components/admin/AdminFilters";
+
 
 const ManageReviews = () => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [hotelFilter, setHotelFilter] = useState("ALL");
+  const [ratingFilter, setRatingFilter] = useState("ALL");
 
+  const hotels = [
+  "ALL",
+  ...new Set(
+    reviews
+      .map((review) => review.hotelName)
+      .filter(Boolean)
+  ),
+];
+
+
+const filteredReviews = reviews.filter((review) => {
+  const matchesSearch =
+    review.userName
+      ?.toLowerCase()
+      .includes(search.toLowerCase()) ||
+    review.hotelName
+      ?.toLowerCase()
+      .includes(search.toLowerCase()) ||
+    review.comment
+      ?.toLowerCase()
+      .includes(search.toLowerCase());
+
+  const matchesHotel =
+    hotelFilter === "ALL" ||
+    review.hotelName === hotelFilter;
+
+  const matchesRating =
+    ratingFilter === "ALL" ||
+    review.review === Number(ratingFilter);
+
+  return (
+    matchesSearch &&
+    matchesHotel &&
+    matchesRating
+  );
+});
   const fetchReviews = async () => {
     try {
       setLoading(true);
@@ -51,6 +92,57 @@ const ManageReviews = () => {
         <h2>Manage Reviews</h2>
       </div>
 
+      <AdminFilters
+  search={search}
+  setSearch={setSearch}
+  searchPlaceholder="Search reviews..."
+  filters={[
+    {
+      name: "hotel",
+      value: hotelFilter,
+      onChange: setHotelFilter,
+      options: hotels.map((hotel) => ({
+        value: hotel,
+        label:
+          hotel === "ALL"
+            ? "All Hotels"
+            : hotel,
+      })),
+    },
+    {
+      name: "rating",
+      value: ratingFilter,
+      onChange: setRatingFilter,
+      options: [
+        {
+          value: "ALL",
+          label: "All Ratings",
+        },
+        {
+          value: "5",
+          label: "5 Stars",
+        },
+        {
+          value: "4",
+          label: "4 Stars",
+        },
+        {
+          value: "3",
+          label: "3 Stars",
+        },
+        {
+          value: "2",
+          label: "2 Stars",
+        },
+        {
+          value: "1",
+          label: "1 Star",
+        },
+      ],
+    },
+  ]}
+/>
+
       {loading ? (
         <p>Loading reviews...</p>
       ) : (
@@ -68,7 +160,7 @@ const ManageReviews = () => {
           </thead>
 
           <tbody>
-            {reviews.map((review) => (
+            {filteredReviews.map((review) => (
               <tr key={review.id}>
                 <td style={styles.td}>{review.id}</td>
 
@@ -103,7 +195,7 @@ const ManageReviews = () => {
               </tr>
             ))}
 
-            {reviews.length === 0 && (
+            {filteredReviews.length === 0 && (
               <tr>
                 <td colSpan="7" style={styles.empty}>
                   No reviews found

@@ -1,11 +1,30 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getHotels, deleteHotel } from "../../api/hotelsApi";
+import AdminFilters from "../../components/admin/AdminFilters";
+
 
 const ManageHotels = () => {
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [locationFilter, setLocationFilter] = useState("ALL");
+  const [ratingFilter, setRatingFilter] = useState("ALL");
+
   const navigate = useNavigate();
+
+  const locations = [
+    ...new Set( hotels.map((hotel) => hotel.location) ),
+  ];
+
+const filteredHotels = hotels.filter((hotel) => {
+    const matchesSearch = hotel.name;
+
+    const matchesLocation = locationFilter === "ALL" || hotel.location === locationFilter;
+
+    const matchesRating = ratingFilter === "ALL" || hotel.averageRating === Number(ratingFilter);
+    return matchesSearch && matchesLocation && matchesRating;
+  });
 
   const fetchHotels = async () => {
     try {
@@ -49,6 +68,58 @@ const ManageHotels = () => {
         </button>
       </div>
 
+      
+            <AdminFilters
+              search={search}
+              setSearch={setSearch}
+              searchPlaceholder="Search users..."
+              filters={[
+                  {
+                  name: "location",
+                  value: locationFilter,
+                  onChange: setLocationFilter,
+                  options: [
+                      { value: "ALL", label: "All Locations" },
+                      ...locations.map((loc) => ({
+                        value: loc,
+                        label: loc,
+                      })),
+                  ],
+                  },
+                      {
+                  name: "rating",
+                  value: ratingFilter,
+                  onChange: setRatingFilter,
+                  options: [
+                    {
+                      value: "ALL",
+                      label: "All Ratings",
+                    },
+                    {
+                      value: "5",
+                      label: "5 Stars",
+                    },
+                    {
+                      value: "4",
+                      label: "4 Stars",
+                    },
+                    {
+                      value: "3",
+                      label: "3 Stars",
+                    },
+                    {
+                      value: "2",
+                      label: "2 Stars",
+                    },
+                    {
+                      value: "1",
+                      label: "1 Star",
+                    },
+                  ],
+                },
+              ]}
+              />
+
       {loading ? (
         <p>Loading hotels...</p>
       ) : (
@@ -67,7 +138,7 @@ const ManageHotels = () => {
           </thead>
 
           <tbody>
-            {hotels.map((hotel) => (
+            {filteredHotels.map((hotel) => (
               <tr key={hotel.id}>
                 <td style={styles.td}>{hotel.id}</td>
                 <td style={styles.td}>{hotel.name}</td>
@@ -109,7 +180,7 @@ const ManageHotels = () => {
               </tr>
             ))}
 
-            {hotels.length === 0 && (
+            {filteredHotels.length === 0 && (
               <tr>
                 <td colSpan="8" style={styles.empty}>
                   No hotels found

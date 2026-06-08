@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
 import { getBookings, updateBooking } from "../../api/bookingsApi";
+import AdminFilters from "../../components/admin/AdminFilters";
 
 const ManageBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Filters
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [hotelFilter, setHotelFilter] = useState("ALL");
+  const [priceFilter, setPriceFilter] = useState("ALL");
 
   const fetchBookings = async () => {
     try {
@@ -24,7 +31,6 @@ const ManageBookings = () => {
   }, []);
 
   const handleCancel = async (bookingID) => {
-    console.log("Attempting to cancel booking with ID:", bookingID);
     const confirmCancel = window.confirm(
       "Are you sure you want to cancel this booking?"
     );
@@ -34,7 +40,8 @@ const ManageBookings = () => {
     try {
       const payload = {
         status: "CANCELLED",
-      }
+      };
+
       await updateBooking(bookingID, payload);
 
       setBookings((prev) =>
@@ -50,11 +57,93 @@ const ManageBookings = () => {
     }
   };
 
+  // Unique hotels
+  const hotels = [
+    "ALL",
+    ...new Set(
+      bookings.map((b) => b.hotelName).filter(Boolean)
+    ),
+  ];
+
+  // Filtering logic
+  const filteredBookings = bookings.filter((booking) => {
+    const matchesSearch =
+      booking.hotelName
+        ?.toLowerCase()
+        .includes(search.toLowerCase()) ||
+      booking.bookingID?.toString().includes(search);
+
+    const matchesStatus =
+      statusFilter === "ALL" ||
+      booking.status === statusFilter;
+
+    const matchesHotel =
+      hotelFilter === "ALL" ||
+      booking.hotelName === hotelFilter;
+
+    const matchesPrice =
+      priceFilter === "ALL" ||
+      (priceFilter === "LOW" &&
+        booking.totalPayment < 100) ||
+      (priceFilter === "MEDIUM" &&
+        booking.totalPayment >= 100 &&
+        booking.totalPayment <= 500) ||
+      (priceFilter === "HIGH" &&
+        booking.totalPayment > 500);
+
+    return (
+      matchesSearch &&
+      matchesStatus &&
+      matchesHotel &&
+      matchesPrice
+    );
+  });
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
         <h2>Manage Bookings</h2>
       </div>
+
+      {/* FILTERS */}
+      <AdminFilters
+        search={search}
+        setSearch={setSearch}
+        searchPlaceholder="Search bookings..."
+        filters={[
+          {
+            name: "status",
+            value: statusFilter,
+            onChange: setStatusFilter,
+            options: [
+              { value: "ALL", label: "Any Status" },
+              { value: "PENDING", label: "Pending" },
+              { value: "CONFIRMED", label: "Confirmed" },
+              { value: "CANCELLED", label: "Cancelled" },
+            ],
+          },
+          {
+            name: "hotel",
+            value: hotelFilter,
+            onChange: setHotelFilter,
+            options: hotels.map((h) => ({
+              value: h,
+              label: h === "ALL" ? "All Hotels" : h,
+            })),
+          },
+          {
+            name: "price",
+            value: priceFilter,
+            onChange: setPriceFilter,
+            options: [
+              { value: "ALL", label: "All Prices" },
+              { value: "LOW", label: "< $100" },
+              { value: "MEDIUM", label: "$100 - $500" },
+              { value: "HIGH", label: "> $500" },
+            ],
+          },
+        ]}
+      />
 
       {loading ? (
         <p>Loading bookings...</p>
@@ -74,29 +163,19 @@ const ManageBookings = () => {
           </thead>
 
           <tbody>
-            {bookings.map((booking) => (
+            {filteredBookings.map((booking) => (
               <tr key={booking.bookingID}>
                 <td style={styles.td}>{booking.bookingID}</td>
 
-                <td style={styles.td}>
-                  {booking.hotelName || "-"}
-                </td>
+                <td style={styles.td}>{booking.hotelName || "-"}</td>
 
-                <td style={styles.td}>
-                  {booking.roomNumber || "-"}
-                </td>
+                <td style={styles.td}>{booking.roomNumber || "-"}</td>
 
-                <td style={styles.td}>
-                  {booking.CheckIn}
-                </td>
+                <td style={styles.td}>{booking.CheckIn}</td>
 
-                <td style={styles.td}>
-                  {booking.CheckOut}
-                </td>
+                <td style={styles.td}>{booking.CheckOut}</td>
 
-                <td style={styles.td}>
-                  ${booking.totalPayment}
-                </td>
+                <td style={styles.td}>${booking.totalPayment}</td>
 
                 <td style={styles.td}>
                   <span
@@ -117,7 +196,9 @@ const ManageBookings = () => {
                   {booking.status === "PENDING" ? (
                     <button
                       style={styles.cancelBtn}
-                      onClick={() => handleCancel(booking.bookingID)}
+                      onClick={() =>
+                        handleCancel(booking.bookingID)
+                      }
                     >
                       Cancel
                     </button>
@@ -130,7 +211,7 @@ const ManageBookings = () => {
               </tr>
             ))}
 
-            {bookings.length === 0 && (
+            {filteredBookings.length === 0 && (
               <tr>
                 <td colSpan="8" style={styles.empty}>
                   No bookings found
@@ -163,40 +244,13 @@ const styles = {
     tableLayout: "fixed",
   },
 
-  thId: {
-    width: "60px",
-    textAlign: "center",
-  },
-
-  thHotel: {
-    width: "180px",
-    textAlign: "center",
-  },
-
-  thRoom: {
-    width: "90px",
-    textAlign: "center",
-  },
-
-  thDate: {
-    width: "130px",
-    textAlign: "center",
-  },
-
-  thPrice: {
-    width: "100px",
-    textAlign: "center",
-  },
-
-  thStatus: {
-    width: "120px",
-    textAlign: "center",
-  },
-
-  thActions: {
-    width: "180px",
-    textAlign: "center",
-  },
+  thId: { width: "60px", textAlign: "center" },
+  thHotel: { width: "180px", textAlign: "center" },
+  thRoom: { width: "90px", textAlign: "center" },
+  thDate: { width: "130px", textAlign: "center" },
+  thPrice: { width: "100px", textAlign: "center" },
+  thStatus: { width: "120px", textAlign: "center" },
+  thActions: { width: "180px", textAlign: "center" },
 
   td: {
     textAlign: "center",

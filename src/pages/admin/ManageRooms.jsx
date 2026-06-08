@@ -1,13 +1,69 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getRooms, deleteRoom } from "../../api/roomsApi";
+import AdminFilters from "../../components/admin/AdminFilters";
 
 const ManageRooms = () => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [hotelFilter, setHotelFilter] =useState("ALL");
+  const [typeFilter, setTypeFilter] =useState("ALL");
+  const [availabilityFilter, setAvailabilityFilter] =useState("ALL");
+  
 
   const navigate = useNavigate();
+  const hotels = [
+  "ALL",
+  ...new Set(
+    rooms.map(
+      (room) =>
+        room.hotelName
+    )
+  ),
+];
+const roomTypes = [
+  "ALL",
+  ...new Set(
+    rooms.map(
+      (room) =>
+        room.roomType ||
+        room.roomtype
+    )
+  ),
+];
+  const filteredRooms = rooms.filter((room) => {
+  const hotelName =room.hotelName;
 
+  const roomType =room.roomtype;
+
+  const matchesSearch =
+    room.roomNumber
+      ?.toString()
+      .includes(search);
+
+  const matchesHotel =
+    hotelFilter === "ALL" ||
+    hotelName === hotelFilter;
+
+  const matchesType =
+    typeFilter === "ALL" ||
+    roomType === typeFilter;
+
+  const matchesAvailability =
+    availabilityFilter === "ALL" ||
+    (availabilityFilter === "AVAILABLE" &&
+      room.availability) ||
+    (availabilityFilter === "UNAVAILABLE" &&
+      !room.availability);
+
+  return (
+    matchesSearch &&
+    matchesHotel &&
+    matchesType &&
+    matchesAvailability
+  );
+});
   const fetchRooms = async () => {
     try {
       setLoading(true);
@@ -52,6 +108,57 @@ const ManageRooms = () => {
         </button>
       </div>
 
+      <AdminFilters
+  search={search}
+  setSearch={setSearch}
+  searchPlaceholder="Search room number..."
+  filters={[
+    {
+      name: "hotel",
+      value: hotelFilter,
+      onChange: setHotelFilter,
+      options: hotels.map((hotel) => ({
+        value: hotel,
+        label:
+          hotel === "ALL"
+            ? "All Hotels"
+            : hotel,
+      })),
+    },
+    {
+      name: "type",
+      value: typeFilter,
+      onChange: setTypeFilter,
+      options: roomTypes.map((type) => ({
+        value: type,
+        label:
+          type === "ALL"
+            ? "All Types"
+            : type,
+      })),
+    },
+    {
+      name: "availability",
+      value: availabilityFilter,
+      onChange: setAvailabilityFilter,
+      options: [
+        {
+          value: "ALL",
+          label: "All Rooms",
+        },
+        {
+          value: "AVAILABLE",
+          label: "Available",
+        },
+        {
+          value: "UNAVAILABLE",
+          label: "Unavailable",
+        },
+      ],
+    },
+  ]}
+/>
+
       {loading ? (
         <p>Loading rooms...</p>
       ) : (
@@ -70,7 +177,7 @@ const ManageRooms = () => {
           </thead>
 
           <tbody>
-            {rooms.map((room) => (
+            {filteredRooms.map((room) => (
               <tr key={room.id}>
                 <td style={styles.td}>{room.id}</td>
                 <td style={styles.td}>{room.roomNumber}</td>

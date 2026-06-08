@@ -3,11 +3,39 @@ import {
   getAllUsers,
   updateUserStatus,
 } from "../../api/userApi";
+import AdminFilters from "../../components/admin/AdminFilters";
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Filters state management
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [roleFilter, setRoleFilter] = useState("ALL");
+
+  const filteredUsers = users.filter((user) => {
+  const matchesSearch =
+    user.name
+      .toLowerCase()
+      .includes(search.toLowerCase()) ||
+    user.email
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+  const matchesStatus =
+    statusFilter === "ALL" ||
+    (statusFilter === "ACTIVE" &&
+      user.status) ||
+    (statusFilter === "INACTIVE" &&
+      !user.status);
+
+    const matchesRole = 
+    roleFilter === "ALL" ||
+    user.role === roleFilter;
+
+  return matchesSearch && matchesStatus && matchesRole;
+});
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -70,6 +98,34 @@ const ManageUsers = () => {
         <h2>Manage Users</h2>
       </div>
 
+      <AdminFilters
+        search={search}
+        setSearch={setSearch}
+        searchPlaceholder="Search users..."
+        filters={[
+            {
+            name: "status",
+            value: statusFilter,
+            onChange: setStatusFilter,
+            options: [
+                { value: "ALL", label: "All Users" },
+                { value: "ACTIVE", label: "Active" },
+                { value: "INACTIVE", label: "Inactive" },
+            ],
+            },
+            {
+        name: "role",
+        value: roleFilter,
+        onChange: setRoleFilter,
+        options: [
+            { value: "ALL", label: "All Roles" },
+            { value: "ADMIN", label: "Admin" },
+            { value: "GUEST", label: "Guest" },
+      ],
+    },
+        ]}
+        />
+
       {loading ? (
         <p>Loading users...</p>
       ) : (
@@ -88,7 +144,7 @@ const ManageUsers = () => {
           </thead>
 
           <tbody>
-            {users.map((user) => (
+            {filteredUsers.map((user) => (
               <tr key={user.id}>
                 <td style={styles.td}>
                   {user.id}
