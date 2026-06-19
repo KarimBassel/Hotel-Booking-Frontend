@@ -1,0 +1,57 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ secrets.STAGING_BACKEND_URL }}
+
+      - name: Deploy to staging
+        run: |
+          curl -X POST ${{ secrets.STAGING_FRONTEND_DEPLOY_WEBHOOK }}
+
+      - name: Wait for staging deployment
+        run: |
+          echo "Waiting for staging deployment..."
+          for i in {1..30}; do
+            if curl -f ${{ secrets.STAGING_FRONTEND_URL }}; then
+              echo "Staging is ready"
+              exit 0
+            fi
+            echo "Not ready yet... retrying"
+            sleep 10
+          done
+          echo "Staging deployment failed to become ready"
+          exit 1
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright E2E tests
+        run: npx playwright test
+        env:
+          NODE_ENV: staging
+
+      - name: Deploy to production
+        if: success()
+        run: |
+          curl -X POST ${{ secrets.PROD_FRONTEND_DEPLOY_WEBHOOK }}
