@@ -144,7 +144,7 @@ const CheckoutForm = () => {
           {error && <div style={styles.error}>{error}</div>}
 
           <form onSubmit={handleSubmit}>
-            <div style={styles.cardBox}>
+            <div style={styles.cardBox} data-testid="card-element">
               <CardElement />
             </div>
 

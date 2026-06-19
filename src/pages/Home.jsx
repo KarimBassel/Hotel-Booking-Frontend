@@ -12,7 +12,7 @@ const Home = () => {
           <p style={styles.heroSubtitle}>
             Book luxury hotels and resorts at the best prices. Your dream vacation awaits.
           </p>
-          <button onClick={() => navigate("/hotels")} style={styles.ctaButton}>
+          <button onClick={() => navigate("/hotels")} style={styles.ctaButton} data-testid="explore-hotels-button">
             Explore Hotels
           </button>
         </div>

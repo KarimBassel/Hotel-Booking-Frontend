@@ -148,6 +148,7 @@ const Profile = () => {
           type="text"
           name="name"
           value={form.name}
+          data-testid="name-input"
           onChange={handleChange}
           placeholder="Name"
           style={styles.input}
@@ -174,7 +175,7 @@ const Profile = () => {
         />
 
         {/* MESSAGE */}
-        {message && <div style={styles.message}>{message}</div>}
+        {message && <div style={styles.message} data-testid="profile-message">{message}</div>}
 
         {/* UPDATE BUTTON */}
         <button

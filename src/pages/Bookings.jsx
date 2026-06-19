@@ -46,9 +46,12 @@ const Bookings = () => {
     }
 
     try {
+        const payload = {
+          status: "CANCELLED",
+        }
       await updateBooking(
         booking.bookingID,
-        "CANCELLED"
+        payload
       );
 
       setBookings((prev) =>
@@ -77,6 +80,9 @@ const Bookings = () => {
   const handleReviewNavigation = async (
     booking
   ) => {
+      console.log("booking object:", booking);
+  console.log("HotelID value:", booking.HotelID);
+
     try {
       const res = await getUserHotelReview(
         booking.HotelID
@@ -167,6 +173,7 @@ const Bookings = () => {
         <div style={styles.list}>
           {bookings.map((booking) => (
             <div
+              className="booking-card"
               key={booking.bookingID}
               style={styles.card}
             >

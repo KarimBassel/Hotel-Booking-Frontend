@@ -169,6 +169,7 @@ function Login() {
               id="password"
               type="password"
               placeholder="••••••••"
+              data-testid="login-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={styles.input}

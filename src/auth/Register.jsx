@@ -160,6 +160,7 @@ function Register() {
               id="password"
               type="password"
               placeholder="••••••••"
+              data-testid="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={styles.input}
@@ -173,6 +174,7 @@ function Register() {
               id="confirm"
               type="password"
               placeholder="••••••••"
+              data-testid="confirm-password"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               style={styles.input}
@@ -199,6 +201,7 @@ function Register() {
 
           <button
             type="button"
+            data-testid="back-to-login"
             onClick={() => (window.location.href = "/login")}
             style={{
               marginTop: 10,
@@ -215,7 +218,7 @@ function Register() {
             Back to login
           </button>
 
-          <div style={styles.meta}>
+          <div style={styles.meta} data-testid="register-meta">
             {error && <div style={styles.error}>{error}</div>}
             {success && <div style={styles.success}>Account created.</div>}
           </div>
