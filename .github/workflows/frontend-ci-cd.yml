@@ -5,7 +5,7 @@ on:
     branches: [master]
 
 jobs:
-  pipeline:
+  deploy-staging:
     runs-on: ubuntu-latest
 
     steps:
@@ -40,18 +40,18 @@ jobs:
             echo "Not ready yet... retrying"
             sleep 10
           done
-          echo "Staging deployment failed to become ready"
+          echo "Staging deployment failed"
           exit 1
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+  playwright:
+    needs: deploy-staging
+    uses: KarimBassel/Hotel-Booking-Frontend/.github/workflows/playwright.yml@master
+    secrets: inherit
 
-      - name: Run Playwright E2E tests
-        run: npx playwright test
-        env:
-          NODE_ENV: staging
-
+  deploy-production:
+    needs: playwright
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to production
-        if: success()
         run: |
           curl -X POST ${{ secrets.PROD_FRONTEND_DEPLOY_WEBHOOK }}
