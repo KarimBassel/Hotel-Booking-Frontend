@@ -40,7 +40,6 @@ export default defineConfig({
     //process.env used when outside browser context, playwright tests for example
     //import.meta.env used when inside browser context, when launching the app with Vite for example
   baseURL: process.env.VITE_FRONTEND_URL,
-  storageState: "playwright/.auth/guest.json",
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },
