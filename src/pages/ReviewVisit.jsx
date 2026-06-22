@@ -32,36 +32,57 @@ const ReviewVisit = () => {
   };
 
 
-  const handleSubmit = async () => {
-    if (!isFormValid()) return;
+const handleSubmit = async () => {
+  if (!isFormValid()) return;
 
-    try {
+  try {
+    console.log("=== REVIEW SUBMISSION START ===");
+    console.log("existingReview:", existingReview);
+    console.log("booking:", booking);
+    console.log("rating:", rating);
+    console.log("comment:", comment);
 
-      if (existingReview) {
-        const payload = {
-            reviewID: existingReview?.id,
-            rating,
-            comment,
+    if (existingReview) {
+      const payload = {
+        reviewID: existingReview?.id,
+        rating,
+        comment,
       };
-        await updateHotelReview(payload);
-        console.log("Review updated successfully");
-      } else {
-        const payload = {
-            hotelID: booking?.HotelID,
-            rating,
-            comment,
+
+      console.log("Updating review with payload:", payload);
+
+      const response = await updateHotelReview(payload);
+
+      console.log("Update review response:", response);
+      console.log("Review updated successfully");
+    } else {
+      const payload = {
+        hotelID: booking?.HotelID,
+        rating,
+        comment,
       };
-        await CreateReview(payload);
-        console.log("Review created successfully");
-      }
 
-      navigate("/bookings");
+      console.log("Creating review with payload:", payload);
 
-    } catch (err) {
-      console.error("REVIEW ERROR:", err);
-      alert("Failed to submit review");
+      const response = await CreateReview(payload);
+
+      console.log("Create review response:", response);
+      console.log("Review created successfully");
     }
-  };
+
+    console.log("Navigating to /bookings");
+    navigate("/bookings");
+
+  } catch (err) {
+    console.error("=== REVIEW ERROR ===");
+    console.error("Error object:", err);
+    console.error("Error response:", err?.response);
+    console.error("Error status:", err?.response?.status);
+    console.error("Error data:", err?.response?.data);
+
+    alert("Failed to submit review");
+  }
+};
 
 
 

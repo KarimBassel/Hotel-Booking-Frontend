@@ -31,8 +31,8 @@ test('Submit & Update User Review', async ({ page }) => {
     await page.waitForTimeout(10000);
     await page.getByRole('link', { name: 'Reviews' }).click();
     await expect(page.getByRole('paragraph')).toContainText('Very good service, Keep up the good work!');
-
-      //Update Review
+    //await page.pause();
+    //Update Review
     await page.getByRole('link', { name: 'Bookings' }).click();
     await page.getByRole('button', { name: 'Review Visit' }).first().click();
     await page.getByRole('textbox', { name: 'Tell us about your experience' }).click();

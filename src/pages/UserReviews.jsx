@@ -11,16 +11,24 @@ const UserReviews = () => {
     loadReviews();
   }, []);
 
-  const loadReviews = async () => {
-    try {
-      const res = await getUserReviews();
-      setReviews(res.data || []);
-    } catch (err) {
-      console.error("Failed to load reviews:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+const loadReviews = async () => {
+  try {
+    console.log("Loading user reviews...");
+
+    const res = await getUserReviews();
+
+    console.log("Reviews API response:", res);
+    console.log("Reviews data:", res.data);
+
+    setReviews(res.data || []);
+  } catch (err) {
+    console.error("GET REVIEWS ERROR:", err);
+    console.error("Status:", err?.response?.status);
+    console.error("Data:", err?.response?.data);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, i) => (
