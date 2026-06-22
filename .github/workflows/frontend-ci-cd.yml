@@ -42,9 +42,31 @@ jobs:
           done
           echo "Staging deployment failed"
           exit 1
+  Wait_for_backend_health:
+    needs: deploy_staging
+    runs-on: ubuntu-latest
 
+    steps:
+      - name: Staging Health Checks
+        run: |
+          echo "Waiting for backend..."
+          
+          for i in {1..30}; do
+            STATUS=$(curl -s https://java-spring-boot-hotel-booking-system-5smr.onrender.com/actuator/health | grep UP)
+          
+            if [ ! -z "$STATUS" ]; then
+              echo "Backend is healthy"
+              exit 0
+            fi
+          
+            echo "Still starting..."
+            sleep 10
+          done
+          
+          echo "Backend failed to become healthy"
+          exit 1
   playwright:
-    needs: deploy-staging
+    needs: Wait_for_backend_health
     uses: KarimBassel/Hotel-Booking-Frontend/.github/workflows/playwright.yml@master
     secrets: inherit
 
