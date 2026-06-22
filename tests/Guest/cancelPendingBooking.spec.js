@@ -22,9 +22,9 @@ test('guest can cancel pending booking', async ({ page }) => {
 
       await page.getByRole('textbox').first().fill('2083-02-08');
       await page.getByRole('textbox').nth(1).fill('2083-02-09');
-      await page.waitForTimeout(5000); 
+      await page.waitForTimeout(10000); 
       await page.getByRole('button', { name: 'Proceed to Payment' }).click();
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(10000);
 
 
       await page.getByRole('link', { name: 'Bookings' }).click();

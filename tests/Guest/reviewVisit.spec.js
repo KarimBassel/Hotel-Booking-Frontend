@@ -28,6 +28,7 @@ test('Submit & Update User Review', async ({ page }) => {
     await page.getByRole('button', { name: 'Submit Review' }).click();
     await page.goto(`${process.env.VITE_FRONTEND_URL}/bookings`);
     //Make sure review recorded
+    await page.waitForTimeout(10000);
     await page.getByRole('link', { name: 'Reviews' }).click();
     await expect(page.getByRole('paragraph')).toContainText('Very good service, Keep up the good work!');
 
@@ -37,7 +38,7 @@ test('Submit & Update User Review', async ({ page }) => {
     await page.getByRole('textbox', { name: 'Tell us about your experience' }).click();
     await page.getByRole('textbox', { name: 'Tell us about your experience' }).fill('Comment Updated');
     await page.getByRole('button', { name: 'Update Review' }).click();
-    await page.goto('http://localhost:5173/bookings');
+    await page.goto(`${process.env.VITE_FRONTEND_URL}/bookings`);
     //Make sure review updated
     await page.getByRole('link', { name: 'Reviews' }).click();
     await expect(page.getByRole('paragraph')).toContainText('Comment Updated');
