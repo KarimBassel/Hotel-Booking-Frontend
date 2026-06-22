@@ -26,9 +26,10 @@ test('Submit & Update User Review', async ({ page }) => {
     await page.getByRole('textbox', { name: 'Tell us about your experience' }).click();
     await page.getByRole('textbox', { name: 'Tell us about your experience' }).fill('Very good service, Keep up the good work!');
     await page.getByRole('button', { name: 'Submit Review' }).click();
+    await page.waitForTimeout(10000);
     await page.goto(`${process.env.VITE_FRONTEND_URL}/bookings`);
     //Make sure review recorded
-    await page.waitForTimeout(10000);
+    await page.waitForTimeout(20000);
     await page.getByRole('link', { name: 'Reviews' }).click();
     await expect(page.getByRole('paragraph')).toContainText('Very good service, Keep up the good work!');
     //await page.pause();

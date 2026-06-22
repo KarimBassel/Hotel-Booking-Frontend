@@ -22,7 +22,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   //Retry 3 times to avoid test flakiness
-  retries: 3,
+  retries: 1,
   /* Opt out of parallel tests on CI. */
   // Disable Parallel runs to prevent race conditions
   workers: 1,
