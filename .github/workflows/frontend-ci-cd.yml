@@ -43,7 +43,7 @@ jobs:
           echo "Staging deployment failed"
           exit 1
   Wait_for_backend_health:
-    needs: deploy_staging
+    needs: deploy-staging
     runs-on: ubuntu-latest
 
     steps:
