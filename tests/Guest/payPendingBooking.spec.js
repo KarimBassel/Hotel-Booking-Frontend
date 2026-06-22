@@ -23,13 +23,13 @@ test('guest can pay pending booking', async ({ page }) => {
 
       await page.getByRole('textbox').first().fill('2083-02-06');
       await page.getByRole('textbox').nth(1).fill('2083-02-07');
-
+      await page.waitForTimeout(5000); 
       await page.getByRole('button', { name: 'Proceed to Payment' }).click();
       await page.waitForTimeout(1000);
       //Pay Pending Reservation
       await page.getByRole('link', { name: 'Bookings' }).click();
       await page.waitForTimeout(1000); 
-      const bookingCard = page.locator('.booking-card').last();
+      const bookingCard = page.locator('.booking-card').first();
       await expect(bookingCard).toContainText('PENDING');
 
       await page.getByRole('button', { name: 'View Details' }).last().click();
@@ -54,7 +54,7 @@ test('guest can pay pending booking', async ({ page }) => {
   }finally{
 
       try{
-        // Delete the review created during the test
+        // Delete the bookings created during the test
         const response = await fetch(
           `${process.env.VITE_BACKEND_URL}/api/test/cleanup-bookings`,
           {method : "DELETE"}
@@ -64,5 +64,5 @@ test('guest can pay pending booking', async ({ page }) => {
       }
 
     }
-    
+
 });

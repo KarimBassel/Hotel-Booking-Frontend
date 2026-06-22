@@ -22,7 +22,7 @@ test('guest can perform booking', async ({ page }) => {
 
       await page.getByRole('textbox').first().fill('2083-02-01');
       await page.getByRole('textbox').nth(1).fill('2083-02-05');
-
+      await page.waitForTimeout(5000); 
       await page.getByRole('button', { name: 'Proceed to Payment' }).click();
 
 
@@ -37,7 +37,7 @@ test('guest can perform booking', async ({ page }) => {
 
       await page.waitForURL('**/bookings');
 
-      const bookingCard = page.locator('.booking-card').last();
+      const bookingCard = page.locator('.booking-card').first();
 
       await expect(bookingCard).toContainText('2/1/2083');
       await expect(bookingCard).toContainText('2/5/2083');
@@ -46,7 +46,7 @@ test('guest can perform booking', async ({ page }) => {
   }finally{
 
       try{
-        // Delete the review created during the test
+        // Delete the bookings created during the test
         const response = await fetch(
           `${process.env.VITE_BACKEND_URL}/api/test/cleanup-bookings`,
           {method : "DELETE"}
