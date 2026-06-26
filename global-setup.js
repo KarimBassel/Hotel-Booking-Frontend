@@ -6,6 +6,8 @@ import dotenv from "dotenv";
 export default async function globalSetup() {
   //Loads environment variables from .env file into process.env
   dotenv.config();
+
+  
   const browser = await chromium.launch();
   const page = await browser.newPage();
 

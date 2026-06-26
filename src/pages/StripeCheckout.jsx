@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
-import { updateBooking } from "../api/bookingsApi";
+import { getBookingById } from "../api/bookingsApi";
 import {
   Elements,
   CardElement,
@@ -57,12 +57,20 @@ const CheckoutForm = () => {
     setLoading(true);
 
     try {
-      const clientSecret = await createPaymentIntent(totalPrice);
-
+      //const clientSecret = await createPaymentIntent(totalPrice);
+      const payload = {
+        BookingID: bookingId,
+        Amount: totalPrice,
+      };
+      const paymentIntent =await createPaymentIntent(payload);
+      const clientSecret = paymentIntent.clientSecret;
       const cardElement = elements.getElement(CardElement);
 
+      //Stripe hits confirm endpoint using a webhook
       const result = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: { card: cardElement },
+      payment_method: {
+        card: cardElement,
+        },
       });
 
       if (result.error) {
@@ -70,19 +78,45 @@ const CheckoutForm = () => {
       } else if (result.paymentIntent?.status === "succeeded") {
         setSuccess(true);
 
-        try {
-          const payload = {
-            status: "CONFIRMED",
+        // Wait for webhook to update DB
+        const maxAttempts = 10;
+
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+          const response = await getBookingById(bookingId);
+          const booking = response.data;
+
+          if (booking.status === "CONFIRMED") {
+            navigate("/bookings");
+            return;
           }
-          await updateBooking(bookingId, payload);
-        } catch (err) {
-          console.error("Failed to update booking:", err);
+
+          // wait 1 second before trying again
+          await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
-        setTimeout(() => {
-          navigate("/bookings");
-        }, 2000);
+        setError("Payment succeeded, but confirmation is taking longer than expected.");
+
+
       }
+
+      // if (result.error) {
+      //   setError(result.error.message);
+      // } else if (result.paymentIntent?.status === "succeeded") {
+      //   setSuccess(true);
+
+      //   // try {
+      //   //   const payload = {
+      //   //     status: "CONFIRMED",
+      //   //   }
+      //   //   await updateBooking(bookingId, payload);
+      //   // } catch (err) {
+      //   //   console.error("Failed to update booking:", err);
+      //   // }
+
+      //   setTimeout(() => {
+      //     navigate("/bookings");
+      //   }, 2000);
+      // }
     } catch (err) {
       console.error(err);
       setError(err.message || "Payment failed");
