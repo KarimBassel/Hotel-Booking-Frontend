@@ -170,13 +170,17 @@ const ReviewVisit = () => {
 
 const styles = {
   container: {
-    maxWidth: 700,
-    margin: "40px auto",
+    maxWidth: "min(100%, 700px)",
+    margin: "2.5rem auto",
     fontFamily: "Arial",
+    padding: "clamp(1rem, 3vw, 1.25rem)",
+    width: "100%",
+    boxSizing: "border-box",
   },
 
   title: {
-    marginBottom: 20,
+    marginBottom: "1.25rem",
+    fontSize: "clamp(1.5rem, 3vw, 2rem)",
   },
 
   center: {
@@ -185,30 +189,33 @@ const styles = {
 
   card: {
     background: "#fff",
-    padding: 20,
+    padding: "clamp(1rem, 2vw, 1.25rem)",
     borderRadius: 12,
     boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
-    marginBottom: 15,
+    marginBottom: "1rem",
+    width: "100%",
   },
 
   stars: {
     display: "flex",
-    gap: 8,
-    marginTop: 10,
+    gap: "0.5rem",
+    marginTop: "0.625rem",
+    flexWrap: "wrap",
   },
 
   textarea: {
     width: "100%",
-    height: 120,
-    padding: 10,
+    minHeight: "7.5rem",
+    padding: "0.7rem",
     borderRadius: 8,
     border: "1px solid #ddd",
-    marginTop: 10,
+    marginTop: "0.625rem",
+    boxSizing: "border-box",
   },
 
   error: {
-    marginBottom: 15,
-    padding: 12,
+    marginBottom: "1rem",
+    padding: "0.75rem",
     borderRadius: 8,
     background: "#fee2e2",
     color: "#b91c1c",
@@ -218,7 +225,7 @@ const styles = {
 
   button: {
     width: "100%",
-    padding: 12,
+    padding: "0.75rem",
     background: "#ca8a04",
     color: "#fff",
     border: "none",

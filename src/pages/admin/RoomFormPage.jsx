@@ -264,35 +264,37 @@ const styles = {
   container: {
     display: "flex",
     justifyContent: "center",
-    padding: "40px",
+    padding: "clamp(1rem, 3vw, 2.5rem)",
     background: "#f1f5f9",
-    minHeight: "100vh",
+    minHeight: "100dvh",
+    width: "100%",
+    boxSizing: "border-box",
   },
 
   card: {
-    width: "100%",
-    maxWidth: "700px",
+    width: "min(100%, 700px)",
     background: "#fff",
-    padding: "30px",
+    padding: "clamp(1rem, 3vw, 1.875rem)",
     borderRadius: "16px",
     boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
   },
 
   title: {
-    marginBottom: "20px",
+    marginBottom: "1.25rem",
     color: "#1e3a8a",
     textAlign: "center",
+    fontSize: "clamp(1.25rem, 3vw, 1.75rem)",
   },
 
   form: {
     display: "flex",
     flexDirection: "column",
-    gap: "14px",
+    gap: "0.875rem",
   },
 
   image: {
     width: "100%",
-    height: "280px",
+    height: "clamp(180px, 35vw, 280px)",
     objectFit: "cover",
     borderRadius: "12px",
     border: "4px solid #e5e7eb",
@@ -305,50 +307,57 @@ const styles = {
 
   fileInput: {
     textAlign: "center",
+    width: "100%",
   },
 
   field: {
     display: "flex",
     flexDirection: "column",
-    gap: "6px",
+    gap: "0.375rem",
   },
 
   fieldRow: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
+    gap: "0.75rem",
+    flexWrap: "wrap",
   },
 
   input: {
-    padding: "12px",
+    padding: "0.75rem",
     borderRadius: "8px",
     border: "1px solid #d1d5db",
     fontSize: "14px",
+    width: "100%",
   },
 
   buttons: {
     display: "flex",
     justifyContent: "flex-end",
-    gap: "10px",
-    marginTop: "10px",
+    gap: "0.625rem",
+    marginTop: "0.625rem",
+    flexWrap: "wrap",
   },
 
   cancelBtn: {
-    padding: "12px 18px",
+    padding: "0.75rem 1.125rem",
     borderRadius: "8px",
     border: "1px solid #d1d5db",
     background: "#fff",
     cursor: "pointer",
+    width: "fit-content",
   },
 
   saveBtn: {
-    padding: "12px 18px",
+    padding: "0.75rem 1.125rem",
     borderRadius: "8px",
     border: "none",
     background: "linear-gradient(90deg,#2563eb,#06b6d4)",
     color: "#fff",
     fontWeight: "600",
     cursor: "pointer",
+    width: "fit-content",
   },
 };
 

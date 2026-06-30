@@ -240,24 +240,29 @@ const roomTypes = [
 
 const styles = {
   container: {
-    padding: "20px",
+    padding: "clamp(1rem, 2.5vw, 1.25rem)",
+    width: "100%",
+    boxSizing: "border-box",
   },
 
   header: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: "15px",
+    gap: "0.75rem",
+    flexWrap: "wrap",
+    marginBottom: "1rem",
   },
 
   addBtn: {
     backgroundColor: "#1e3a8a",
     color: "white",
     border: "none",
-    padding: "10px 14px",
+    padding: "0.7rem 0.9rem",
     borderRadius: "8px",
     cursor: "pointer",
     fontWeight: "600",
+    width: "fit-content",
   },
 
   table: {
@@ -265,9 +270,10 @@ const styles = {
     borderCollapse: "collapse",
     backgroundColor: "white",
     borderRadius: "10px",
-    overflow: "hidden",
+    overflowX: "auto",
     boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
     tableLayout: "fixed",
+    display: "block",
   },
 
   thId: { width: "50px", textAlign: "center" },
@@ -281,13 +287,13 @@ const styles = {
 
   td: {
     textAlign: "center",
-    padding: "10px",
+    padding: "0.7rem",
     verticalAlign: "middle",
   },
 
   image: {
-    width: "60px",
-    height: "40px",
+    width: "clamp(50px, 10vw, 60px)",
+    height: "clamp(35px, 8vw, 40px)",
     objectFit: "cover",
     borderRadius: "6px",
   },
@@ -295,14 +301,15 @@ const styles = {
   actions: {
     display: "flex",
     justifyContent: "center",
-    gap: "8px",
-    padding: "10px",
+    gap: "0.5rem",
+    padding: "0.7rem",
+    flexWrap: "wrap",
   },
 
   editBtn: {
     backgroundColor: "#facc15",
     border: "none",
-    padding: "6px 10px",
+    padding: "0.4rem 0.7rem",
     borderRadius: "6px",
     cursor: "pointer",
     fontWeight: "600",
@@ -312,7 +319,7 @@ const styles = {
     backgroundColor: "#ef4444",
     color: "white",
     border: "none",
-    padding: "6px 10px",
+    padding: "0.4rem 0.7rem",
     borderRadius: "6px",
     cursor: "pointer",
     fontWeight: "600",
@@ -320,7 +327,7 @@ const styles = {
 
   empty: {
     textAlign: "center",
-    padding: "20px",
+    padding: "1.25rem",
   },
 };
 

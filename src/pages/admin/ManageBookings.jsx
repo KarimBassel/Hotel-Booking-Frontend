@@ -227,11 +227,13 @@ const ManageBookings = () => {
 
 const styles = {
   container: {
-    padding: "20px",
+    padding: "clamp(1rem, 2.5vw, 1.25rem)",
+    width: "100%",
+    boxSizing: "border-box",
   },
 
   header: {
-    marginBottom: "20px",
+    marginBottom: "1.25rem",
   },
 
   table: {
@@ -239,9 +241,10 @@ const styles = {
     borderCollapse: "collapse",
     backgroundColor: "white",
     borderRadius: "10px",
-    overflow: "hidden",
+    overflowX: "auto",
     boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
     tableLayout: "fixed",
+    display: "block",
   },
 
   thId: { width: "60px", textAlign: "center" },
@@ -254,12 +257,12 @@ const styles = {
 
   td: {
     textAlign: "center",
-    padding: "12px",
+    padding: "0.75rem",
     verticalAlign: "middle",
   },
 
   status: {
-    padding: "6px 10px",
+    padding: "0.375rem 0.625rem",
     borderRadius: "999px",
     fontWeight: "600",
     fontSize: "13px",
@@ -284,7 +287,7 @@ const styles = {
     backgroundColor: "#ef4444",
     color: "white",
     border: "none",
-    padding: "6px 12px",
+    padding: "0.4rem 0.75rem",
     borderRadius: "6px",
     cursor: "pointer",
     fontWeight: "600",
@@ -297,7 +300,7 @@ const styles = {
 
   empty: {
     textAlign: "center",
-    padding: "20px",
+    padding: "1.25rem",
   },
 };
 

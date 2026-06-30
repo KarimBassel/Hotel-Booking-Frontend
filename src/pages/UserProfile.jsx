@@ -210,25 +210,28 @@ const styles = {
   container: {
     display: "flex",
     justifyContent: "center",
-    padding: 40,
+    padding: "clamp(1rem, 3vw, 2.5rem)",
     background: "#f1f5f9",
-    minHeight: "100vh",
+    minHeight: "100dvh",
+    width: "100%",
+    boxSizing: "border-box",
   },
 
   card: {
-    width: 420,
+    width: "min(100%, 420px)",
     background: "#fff",
-    padding: 30,
+    padding: "clamp(1rem, 3vw, 1.875rem)",
     borderRadius: 16,
     boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
     display: "flex",
     flexDirection: "column",
-    gap: 12,
+    gap: "0.75rem",
   },
 
   image: {
-    width: 320,
-    height: 320,
+    width: "min(100%, 320px)",
+    height: "min(100%, 320px)",
+    aspectRatio: "1 / 1",
     borderRadius: "50%",
     objectFit: "cover",
     alignSelf: "center",
@@ -238,30 +241,33 @@ const styles = {
   fileInputContainer: {
     display: "flex",
     justifyContent: "center",
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: "0.6rem",
+    marginBottom: "0.6rem",
   },
 
   fileInput: {
     textAlign: "center",
+    width: "100%",
   },
 
   input: {
-    padding: 10,
+    padding: "0.7rem",
     borderRadius: 8,
     border: "1px solid #d1d5db",
     fontSize: 14,
+    width: "100%",
   },
 
   button: {
-    marginTop: 10,
-    padding: 12,
+    marginTop: "0.6rem",
+    padding: "0.75rem",
     borderRadius: 8,
     border: "none",
     background: "linear-gradient(90deg,#2563eb,#06b6d4)",
     color: "#fff",
     fontWeight: "600",
     cursor: "pointer",
+    width: "100%",
   },
 
   message: {
@@ -269,20 +275,21 @@ const styles = {
     color: "#16a34a",
     textAlign: "center",
   },
-    error: {
-    marginBottom: 15,
-    padding: 12,
+  error: {
+    marginBottom: "1rem",
+    padding: "0.75rem",
     borderRadius: 8,
     background: "#fee2e2",
     color: "#b91c1c",
     border: "1px solid #fecaca",
     textAlign: "center",
   },
-errorPage: {
-  minHeight: "100vh",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  background: "#f1f5f9",
-},
+  errorPage: {
+    minHeight: "100dvh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "#f1f5f9",
+    padding: "1rem",
+  },
 };

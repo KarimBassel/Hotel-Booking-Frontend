@@ -211,14 +211,18 @@ const filteredReviews = reviews.filter((review) => {
 
 const styles = {
   container: {
-    padding: "20px",
+    padding: "clamp(1rem, 2.5vw, 1.25rem)",
+    width: "100%",
+    boxSizing: "border-box",
   },
 
   header: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: "15px",
+    gap: "0.75rem",
+    flexWrap: "wrap",
+    marginBottom: "1rem",
   },
 
   table: {
@@ -226,9 +230,10 @@ const styles = {
     borderCollapse: "collapse",
     backgroundColor: "white",
     borderRadius: "10px",
-    overflow: "hidden",
+    overflowX: "auto",
     boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
     tableLayout: "fixed",
+    display: "block",
   },
 
   thId: {
@@ -268,13 +273,13 @@ const styles = {
 
   td: {
     textAlign: "center",
-    padding: "10px",
+    padding: "0.7rem",
     verticalAlign: "middle",
   },
 
   tdDesc: {
     textAlign: "center",
-    padding: "10px",
+    padding: "0.7rem",
     verticalAlign: "middle",
     whiteSpace: "nowrap",
     overflow: "hidden",
@@ -284,15 +289,16 @@ const styles = {
   actions: {
     display: "flex",
     justifyContent: "center",
-    gap: "8px",
-    padding: "10px",
+    gap: "0.5rem",
+    padding: "0.7rem",
+    flexWrap: "wrap",
   },
 
   deleteBtn: {
     backgroundColor: "#ef4444",
     color: "white",
     border: "none",
-    padding: "6px 10px",
+    padding: "0.4rem 0.7rem",
     borderRadius: "6px",
     cursor: "pointer",
     fontWeight: "600",
@@ -300,7 +306,7 @@ const styles = {
 
   empty: {
     textAlign: "center",
-    padding: "20px",
+    padding: "1.25rem",
   },
 };
 

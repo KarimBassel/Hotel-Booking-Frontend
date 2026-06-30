@@ -248,10 +248,12 @@ const HotelDetails = () => {
 
 const styles = {
   container: {
-    padding: 24,
-    maxWidth: 980,
+    padding: "clamp(1rem, 3vw, 1.5rem)",
+    maxWidth: "min(100%, 980px)",
     margin: "0 auto",
     fontFamily: "Arial",
+    width: "100%",
+    boxSizing: "border-box",
   },
 
   center: {
@@ -259,32 +261,37 @@ const styles = {
   },
 
   backButton: {
-    marginBottom: 12,
-    padding: "8px 12px",
+    marginBottom: "0.75rem",
+    padding: "0.5rem 0.75rem",
     borderRadius: 8,
     border: "1px solid #eee",
     background: "#fff",
     cursor: "pointer",
+    width: "fit-content",
   },
 
   header: {
     display: "flex",
-    gap: 18,
+    gap: "1.125rem",
+    flexWrap: "wrap",
+    alignItems: "flex-start",
   },
 
   hero: {
-    width: 360,
-    height: 220,
+    width: "min(100%, 360px)",
+    height: "clamp(180px, 35vw, 220px)",
     borderRadius: 12,
     objectFit: "cover",
   },
 
   headerMeta: {
-    flex: 1,
+    flex: "1 1 280px",
+    minWidth: 0,
   },
 
   title: {
     margin: 0,
+    fontSize: "clamp(1.25rem, 2vw, 1.6rem)",
   },
 
   location: {
@@ -293,8 +300,9 @@ const styles = {
 
   metaRow: {
     display: "flex",
-    gap: 10,
-    marginTop: 10,
+    gap: "0.625rem",
+    marginTop: "0.625rem",
+    flexWrap: "wrap",
   },
 
   price: {
@@ -306,34 +314,34 @@ const styles = {
   },
 
   descriptionFull: {
-    marginTop: 10,
+    marginTop: "0.625rem",
     color: "#555",
   },
 
   section: {
-    marginTop: 30,
+    marginTop: "1.875rem",
   },
 
   sectionTitle: {
-    marginBottom: 10,
+    marginBottom: "0.625rem",
   },
 
   roomsGrid: {
     display: "grid",
-    gridTemplateColumns:
-      "repeat(auto-fill,minmax(220px,1fr))",
-    gap: 12,
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))",
+    gap: "0.75rem",
   },
 
   roomCard: {
-    padding: 12,
+    padding: "0.75rem",
     background: "#fff",
     borderRadius: 10,
+    width: "100%",
   },
 
   roomThumb: {
     width: "100%",
-    height: 120,
+    height: "clamp(120px, 25vw, 160px)",
     borderRadius: 8,
     objectFit: "cover",
   },
@@ -341,7 +349,9 @@ const styles = {
   roomHeader: {
     display: "flex",
     justifyContent: "space-between",
-    marginTop: 8,
+    marginTop: "0.5rem",
+    gap: "0.5rem",
+    flexWrap: "wrap",
   },
 
   roomPrice: {
@@ -350,32 +360,35 @@ const styles = {
   },
 
   bookButton: {
-    marginTop: 10,
+    marginTop: "0.625rem",
     width: "100%",
     background: colors.primary,
     color: "#fff",
     border: "none",
-    padding: 8,
+    padding: "0.5rem",
     borderRadius: 8,
     cursor: "pointer",
   },
 
   reviewsGrid: {
     display: "grid",
-    gap: 12,
+    gap: "0.75rem",
   },
 
   reviewCard: {
     background: "#fff",
-    padding: 12,
+    padding: "0.75rem",
     borderRadius: 10,
     boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+    width: "100%",
   },
 
   reviewHeader: {
     display: "flex",
     justifyContent: "space-between",
-    marginBottom: 6,
+    marginBottom: "0.4rem",
+    gap: "0.5rem",
+    flexWrap: "wrap",
   },
 
   comment: {

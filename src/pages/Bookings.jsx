@@ -261,15 +261,18 @@ const Bookings = () => {
 
 const styles = {
   container: {
-    maxWidth: 900,
-    margin: "40px auto",
-    padding: 20,
+    maxWidth: "min(100%, 900px)",
+    margin: "2.5rem auto",
+    padding: "clamp(1rem, 3vw, 1.25rem)",
     fontFamily: "Arial",
+    width: "100%",
+    boxSizing: "border-box",
   },
 
   title: {
-    marginBottom: 20,
+    marginBottom: "1.25rem",
     color: colors.textDark,
+    fontSize: "clamp(1.5rem, 3vw, 2rem)",
   },
 
   center: {
@@ -278,20 +281,23 @@ const styles = {
 
   list: {
     display: "grid",
-    gap: 16,
+    gap: "1rem",
   },
 
   card: {
     background: "#fff",
-    padding: 20,
+    padding: "clamp(1rem, 2vw, 1.25rem)",
     borderRadius: 12,
     boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
+    width: "100%",
   },
 
   topRow: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
+    gap: "0.75rem",
+    flexWrap: "wrap",
   },
 
   hotel: {
@@ -304,34 +310,37 @@ const styles = {
   },
 
   status: {
-    padding: "6px 14px",
+    padding: "0.375rem 0.875rem",
     borderRadius: 20,
     fontSize: 12,
     fontWeight: "600",
   },
 
-    error: {
-    marginBottom: 15,
-    padding: 12,
+  error: {
+    marginBottom: "1rem",
+    padding: "0.75rem",
     borderRadius: 8,
     background: "#fee2e2",
     color: "#b91c1c",
     border: "1px solid #fecaca",
     textAlign: "center",
   },
-errorPage: {
-  minHeight: "100vh",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  background: "#f1f5f9",
-},
+  errorPage: {
+    minHeight: "100dvh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "#f1f5f9",
+    padding: "1rem",
+  },
 
   middleRow: {
-    marginTop: 15,
+    marginTop: "0.95rem",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
+    gap: "0.75rem",
+    flexWrap: "wrap",
   },
 
   price: {
@@ -340,36 +349,40 @@ errorPage: {
   },
 
   actions: {
-    marginTop: 15,
+    marginTop: "0.95rem",
     display: "flex",
-    gap: 10,
+    gap: "0.625rem",
+    flexWrap: "wrap",
   },
 
   detailsButton: {
     background: colors.primary,
     color: "#fff",
     border: "none",
-    padding: "8px 14px",
+    padding: "0.5rem 0.875rem",
     borderRadius: 8,
     cursor: "pointer",
+    width: "fit-content",
   },
 
   cancelButton: {
     background: "#ef4444",
     color: "#fff",
     border: "none",
-    padding: "8px 14px",
+    padding: "0.5rem 0.875rem",
     borderRadius: 8,
     cursor: "pointer",
+    width: "fit-content",
   },
 
   reviewButton: {
     background: "#ca8a04",
     color: "#fff",
     border: "none",
-    padding: "8px 14px",
+    padding: "0.5rem 0.875rem",
     borderRadius: 8,
     cursor: "pointer",
+    width: "fit-content",
   },
 };
 

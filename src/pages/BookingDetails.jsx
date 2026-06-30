@@ -320,49 +320,54 @@ const BookingDetails = () => {
 
 const styles = {
   container: {
-    padding: 24,
-    maxWidth: 1000,
+    padding: "clamp(1rem, 3vw, 1.5rem)",
+    maxWidth: "min(100%, 1000px)",
     margin: "0 auto",
     fontFamily: "Arial, sans-serif",
+    width: "100%",
+    boxSizing: "border-box",
   },
   backButton: {
-    marginBottom: 20,
-    padding: "8px 12px",
+    marginBottom: "1.25rem",
+    padding: "0.5rem 0.75rem",
     borderRadius: 8,
     border: "1px solid #e6eef8",
     background: "#fff",
     cursor: "pointer",
     fontSize: 14,
+    width: "fit-content",
   },
   content: {
     display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 24,
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
+    gap: "1.25rem",
   },
   infoSection: {
-    padding: 20,
+    padding: "clamp(1rem, 2vw, 1.25rem)",
     borderRadius: 12,
     background: "#fff",
     boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+    width: "100%",
   },
   formSection: {
-    padding: 20,
+    padding: "clamp(1rem, 2vw, 1.25rem)",
     borderRadius: 12,
     background: "#fff",
     boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+    width: "100%",
   },
   title: {
     margin: 0,
-    fontSize: 24,
+    fontSize: "clamp(1.25rem, 2vw, 1.5rem)",
     color: colors.textDark || "#0f172a",
     marginBottom: 8,
   },
   location: {
-    margin: "0 0 16px 0",
+    margin: "0 0 1rem 0",
     color: "#6b7280",
   },
   roomInfo: {
-    marginTop: 20,
+    marginTop: "1.25rem",
   },
   sectionTitle: {
     fontSize: 16,
@@ -371,7 +376,7 @@ const styles = {
   },
   roomImage: {
     width: "100%",
-    height: 200,
+    height: "clamp(180px, 35vw, 220px)",
     borderRadius: 8,
     objectFit: "cover",
     marginBottom: 12,
@@ -393,7 +398,7 @@ const styles = {
   },
   input: {
     width: "100%",
-    padding: "10px 12px",
+    padding: "0.7rem",
     borderRadius: 8,
     border: "1px solid #d1d5db",
     backgroundColor: "#f8fafc",
@@ -422,6 +427,8 @@ const styles = {
     marginBottom: 8,
     fontSize: 14,
     color: "#6b7280",
+    gap: "0.5rem",
+    flexWrap: "wrap",
   },
   priceRowTotal: {
     display: "flex",
@@ -431,6 +438,8 @@ const styles = {
     fontSize: 16,
     fontWeight: "bold",
     color: colors.textDark || "#0f172a",
+    gap: "0.5rem",
+    flexWrap: "wrap",
   },
   error: {
     color: "#ef4444",
@@ -441,7 +450,7 @@ const styles = {
   },
   button: {
     width: "100%",
-    padding: "12px",
+    padding: "0.75rem",
     borderRadius: 8,
     border: "none",
     background: "linear-gradient(90deg,#2563eb,#06b6d4)",

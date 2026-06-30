@@ -90,31 +90,34 @@ const UserReviews = () => {
 
 const styles = {
   container: {
-    maxWidth: 900,
-    margin: "40px auto",
-    padding: 20,
+    maxWidth: "min(100%, 900px)",
+    margin: "2.5rem auto",
+    padding: "clamp(1rem, 3vw, 1.25rem)",
     fontFamily: "Arial",
+    width: "100%",
+    boxSizing: "border-box",
   },
 
   title: {
-    marginBottom: 20,
+    marginBottom: "1.25rem",
     color: colors.textDark,
+    fontSize: "clamp(1.5rem, 3vw, 2rem)",
   },
 
   center: {
     textAlign: "center",
-    marginTop: 40,
+    marginTop: "2.5rem",
     color: "#6b7280",
   },
 
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-    gap: 16,
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))",
+    gap: "1rem",
   },
-    error: {
-    marginBottom: 15,
-    padding: 12,
+  error: {
+    marginBottom: "1rem",
+    padding: "0.75rem",
     borderRadius: 8,
     background: "#fee2e2",
     color: "#b91c1c",
@@ -122,20 +125,22 @@ const styles = {
     textAlign: "center",
   },
   errorPage: {
-  minHeight: "100vh",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  background: "#f1f5f9",
-},
+    minHeight: "100dvh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "#f1f5f9",
+    padding: "1rem",
+  },
   card: {
     background: "#fff",
     borderRadius: 12,
-    padding: 16,
+    padding: "1rem",
     boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
     display: "flex",
     flexDirection: "column",
-    gap: 10,
+    gap: "0.625rem",
+    width: "100%",
   },
 
   hotelName: {
@@ -146,11 +151,12 @@ const styles = {
   stars: {
     display: "flex",
     alignItems: "center",
-    gap: 6,
+    gap: "0.375rem",
+    flexWrap: "wrap",
   },
 
   ratingText: {
-    marginLeft: 6,
+    marginLeft: "0.375rem",
     fontSize: 13,
     color: "#6b7280",
   },
