@@ -23,7 +23,6 @@ function Register() {
         { withCredentials: true }
       );
 
-      console.log(res.data);
       setSuccess(true);
       //Reset fields on refresh
       setName("");
@@ -32,7 +31,6 @@ function Register() {
       setConfirm("");
       setPhonenumber("");
     } catch (err) {
-      console.error("register error:", err);
       setError(err?.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);

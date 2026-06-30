@@ -10,6 +10,8 @@ const Hotels = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  //Hotels will be rendered only once because dependency array is empty, so useEffect will run only once after the initial render
+  //This prevents unnecessary API calls and improves performance by avoiding repeated fetching of the same data.
   useEffect(() => {
     loadHotels();
   }, []);
@@ -26,17 +28,21 @@ const Hotels = () => {
   };
 
   if (loading) return <p style={styles.center}>Loading hotels...</p>;
-  if (error) return <p style={styles.center}>{error}</p>;
+  if (error) {
+    return (
+      <div style={styles.errorPage}>
+        <div style={styles.error}>
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Available Hotels</h1>
 
-      <button style={styles.homeButton} onClick={() => navigate("/")}>
-        ← Back to Home
-      </button>
-
-      {hotels.length === 0 ? (
+      {(hotels.length === 0 && error == "") ? (
         <p style={styles.center}>No hotels available</p>
       ) : (
         <div style={styles.grid}>
@@ -164,6 +170,22 @@ const styles = {
     borderRadius: "8px",
     fontSize: "12px",
   },
+    error: {
+    marginBottom: 15,
+    padding: 12,
+    borderRadius: 8,
+    background: "#fee2e2",
+    color: "#b91c1c",
+    border: "1px solid #fecaca",
+    textAlign: "center",
+  },
+errorPage: {
+  minHeight: "100vh",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  background: "#f1f5f9",
+},
 };
 
 export default Hotels;

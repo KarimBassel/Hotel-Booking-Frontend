@@ -35,6 +35,7 @@ function App() {
 
       {/*
       ProtectRoute function executed before enetring the protected route section
+      if JWT token not found in local storage, automatically redirected to login
       */}
       {/* Protected routes */}
       <Route element={<ProtectedRoute />}>

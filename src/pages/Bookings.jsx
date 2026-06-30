@@ -15,44 +15,49 @@ const Bookings = () => {
 
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
 
     if (userId) {
       loadBookings(userId);
+    } else {
+      setLoading(false);
+      setError("User not found. Please login again.");
     }
   }, []);
 
   const loadBookings = async (userId) => {
+    setLoading(true);
+    setError("");
+
     try {
-      const res = await getBookings(userId);
-      setBookings(res.data);
-
+      const response = await getBookings(userId);
+      setBookings(response.data);
     } catch (err) {
-      console.error("LOAD BOOKINGS ERROR:", err);
+      const message =
+        err.response?.data?.message ||
+        "Could not load your bookings.";
 
+      setError(message);
     } finally {
       setLoading(false);
     }
   };
 
-
   const handleCancel = async (booking) => {
+    setError("");
+
     if (booking.status === "CONFIRMED") {
-      alert("Confirmed bookings cannot be cancelled.");
+      setError("Confirmed bookings cannot be cancelled.");
       return;
     }
 
     try {
-        const payload = {
-          status: "CANCELLED",
-        }
-      await updateBooking(
-        booking.bookingID,
-        payload
-      );
+      const payload = { status: "CANCELLED" };
+
+      await updateBooking(booking.bookingID, payload);
 
       setBookings((prev) =>
         prev.map((b) =>
@@ -61,72 +66,55 @@ const Bookings = () => {
             : b
         )
       );
-
     } catch (err) {
-      console.error("CANCEL BOOKING ERROR:", err);
-      alert("Failed to cancel booking.");
+      console.error("CANCEL ERROR:", err);
+
+      const message =
+        err.response?.data?.message ||
+        "Failed to cancel booking.";
+
+      setError(message);
     }
   };
-
 
   const canReview = (booking) => {
     return (
       booking.status === "CONFIRMED" &&
-      new Date(booking.CheckOut).getTime() <
-        Date.now()
+      new Date(booking.CheckOut).getTime() < Date.now()
     );
   };
 
-  const handleReviewNavigation = async (
-    booking
-  ) => {
-      console.log("booking object:", booking);
-  console.log("HotelID value:", booking.HotelID);
+  const handleReviewNavigation = async (booking) => {
+    setError("");
 
     try {
-      const res = await getUserHotelReview(
-        booking.HotelID
-      );
+      const res = await getUserHotelReview(booking.HotelID);
 
-      console.log(
-        "REVIEW RESPONSE:",
-        res.data
-      );
-
-      // Existing review
       navigate("/review-visit", {
         state: {
           booking,
           review: res.data,
         },
       });
-
     } catch (err) {
+      console.error("REVIEW ERROR:", err);
 
-      console.error(
-        "GET REVIEW ERROR:",
-        err
-      );
-
-      // No review exists yet
       if (err.response?.status === 404) {
         navigate("/review-visit", {
-          state: {
-            booking,
-          },
+          state: { booking },
         });
-
         return;
       }
 
-      alert("Failed to load review.");
+      setError(
+        err.response?.data?.message ||
+        "Failed to load review."
+      );
     }
   };
 
-
   const getStatusStyle = (status) => {
     switch (status) {
-
       case "CONFIRMED":
         return {
           background: "#dcfce7",
@@ -150,22 +138,24 @@ const Bookings = () => {
     }
   };
 
-
   if (loading) {
-    return (
-      <p style={styles.center}>
-        Loading...
-      </p>
-    );
+    return <p style={styles.center}>Loading...</p>;
   }
+  if (error) {
+  return (
+    <div style={styles.errorPage}>
+      <div style={styles.error}>
+        {error}
+      </div>
+    </div>
+  );
+}
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>
-        My Bookings
-      </h1>
+      <h1 style={styles.title}>My Bookings</h1>
 
-      {bookings.length === 0 ? (
+      {(bookings.length === 0 && error == "") ? (
         <p style={styles.center}>
           You have no bookings.
         </p>
@@ -192,9 +182,7 @@ const Bookings = () => {
                 <span
                   style={{
                     ...styles.status,
-                    ...getStatusStyle(
-                      booking.status
-                    ),
+                    ...getStatusStyle(booking.status),
                   }}
                 >
                   {booking.status}
@@ -220,63 +208,43 @@ const Bookings = () => {
                 </div>
 
                 <div style={styles.price}>
-                  $
-                  {booking.totalPayment}
+                  ${booking.totalPayment}
                 </div>
               </div>
 
               {/* ACTIONS */}
               <div style={styles.actions}>
-
-                {/* DETAILS */}
                 <button
-                  style={
-                    styles.detailsButton
-                  }
+                  style={styles.detailsButton}
                   onClick={() =>
-                    navigate(
-                      "/bookingdetails",
-                      {
-                        state: {
-                          booking,
-                          fromBookings: true,
-                        },
-                      }
-                    )
+                    navigate("/bookingdetails", {
+                      state: {
+                        booking,
+                        fromBookings: true,
+                      },
+                    })
                   }
                 >
                   View Details
                 </button>
 
-                {/* CANCEL */}
-                {booking.status !==
-                  "CONFIRMED" &&
-                  booking.status !==
-                    "CANCELLED" && (
+                {booking.status !== "CONFIRMED" &&
+                  booking.status !== "CANCELLED" && (
                     <button
-                      style={
-                        styles.cancelButton
-                      }
+                      style={styles.cancelButton}
                       onClick={() =>
-                        handleCancel(
-                          booking
-                        )
+                        handleCancel(booking)
                       }
                     >
                       Cancel
                     </button>
                   )}
 
-                {/* REVIEW */}
                 {canReview(booking) && (
                   <button
-                    style={
-                      styles.reviewButton
-                    }
+                    style={styles.reviewButton}
                     onClick={() =>
-                      handleReviewNavigation(
-                        booking
-                      )
+                      handleReviewNavigation(booking)
                     }
                   >
                     Review Visit
@@ -290,7 +258,6 @@ const Bookings = () => {
     </div>
   );
 };
-
 
 const styles = {
   container: {
@@ -318,8 +285,7 @@ const styles = {
     background: "#fff",
     padding: 20,
     borderRadius: 12,
-    boxShadow:
-      "0 10px 30px rgba(0,0,0,0.05)",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
   },
 
   topRow: {
@@ -344,11 +310,27 @@ const styles = {
     fontWeight: "600",
   },
 
+    error: {
+    marginBottom: 15,
+    padding: 12,
+    borderRadius: 8,
+    background: "#fee2e2",
+    color: "#b91c1c",
+    border: "1px solid #fecaca",
+    textAlign: "center",
+  },
+errorPage: {
+  minHeight: "100vh",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  background: "#f1f5f9",
+},
+
   middleRow: {
     marginTop: 15,
     display: "flex",
-    justifyContent:
-      "space-between",
+    justifyContent: "space-between",
     alignItems: "center",
   },
 

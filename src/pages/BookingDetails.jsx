@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createBooking,checkRoomAvailability } from "../api/bookingsApi";
 import colors from "../styles/colors";
@@ -12,82 +12,88 @@ const BookingDetails = () => {
   const [checkOutDate, setCheckOutDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [debug, setDebug] = useState(null);
-  const [ValidWindow, setValidWindow] = useState(true);
-  const [EmptyWindow, setEmptyWindow] = useState(false);
-  const [ValidityJustification, setValidityJustification] = useState("");
+  const [availability, setAvailability] = useState({
+    datesValid: true,
+    canProceed: false,
+    message: "",
+  });
 
-  //TBC
-  //Check room availability on a specific date window
-useEffect(() => {
-
-  const fetchAvailability = async () => {
-
-    if (!checkInDate || !checkOutDate)
-      return;
-    if(new Date().toISOString().split("T")[0] > checkInDate){
-      setValidWindow(false);
-      return;
-    }
-    if (new Date(checkOutDate)<=new Date(checkInDate)) {
-      setValidWindow(false);
-      return;
-    }
-    else{
-      setValidWindow(true);
-    }
-
-    if(booking?.status && booking?.status === "PENDING"){
-      setValidWindow(true);
-      setEmptyWindow(true);
-      setValidityJustification("This booking is currently pending. You can proceed to payment or modify the dates.");
-      return;
-    }
-    try {
-      //console.log("ROOM OBJECT:", room);
-      const response =
-        await checkRoomAvailability(
-          room?.id,
-          checkInDate,
-          checkOutDate
-        );
-
-      if (!response.data.available) {
-        setEmptyWindow(false)
-        setValidityJustification(
-          "Room is not available for the selected dates.\n" +
-          "This room has the following bookings during the selected dates: " +
-          response.data.conflicts
-            .map((b) => `(${b.checkIn} to ${b.checkOut})`)
-            .join(", ")
-        );
-
-      } else {
-        setEmptyWindow(true);
-        setValidityJustification(
-          "Room available"
-        );
+    // Check room availability on a specific date window
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      if (!checkInDate || !checkOutDate) {
+        setAvailability({ datesValid: true, canProceed: false, message: "" });
+        return;
       }
 
-    } catch (err) {
-      console.error(err);
-      setEmptyWindow(true);
-    }
-  };
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-  fetchAvailability();
+      const checkIn = new Date(checkInDate);
+      const checkOut = new Date(checkOutDate);
 
-}, [checkInDate,checkOutDate]);
+      if (checkIn < today) {
+        setAvailability({
+          datesValid: false,
+          canProceed: false,
+          message: "Check-in date must be in the future.",
+        });
+        return;
+      }
+
+      if (checkOut <= checkIn) {
+        setAvailability({
+          datesValid: false,
+          canProceed: false,
+          message: "Check-out date must be after check-in date.",
+        });
+        return;
+      }
+
+      if (booking?.status === "PENDING") {
+        setAvailability({
+          datesValid: true,
+          canProceed: true,
+          message: "This booking is currently pending. You can proceed to payment or modify the dates.",
+        });
+        return;
+      }
+
+      try {
+        const response = await checkRoomAvailability(room?.id, checkInDate, checkOutDate);
+
+        if (!response.data.available) {
+          setAvailability({
+            datesValid: true,
+            canProceed: false,
+            message:
+              "Room is not available for the selected dates.\n" +
+              "This room has the following bookings during the selected dates: " +
+              response.data.conflicts
+                .map((b) => `(${b.checkIn} to ${b.checkOut})`)
+                .join(", "),
+          });
+        } else {
+          setAvailability({
+            datesValid: true,
+            canProceed: true,
+            message: "Room available",
+          });
+        }
+      } catch (err) {
+        setAvailability({ datesValid: true, canProceed: false, message: "" });
+      }
+    };
+
+    fetchAvailability();
+  }, [booking?.status, checkInDate, checkOutDate, room?.id]);
   // When coming from Bookings page, populate with existing booking data
   useEffect(() => {
     if (fromBookings && booking) {
       setCheckInDate(booking.CheckIn ? booking.CheckIn.split("T")[0] : "");
       setCheckOutDate(booking.CheckOut ? booking.CheckOut.split("T")[0] : "");
-      setDebug({ source: "Bookings", booking, checkInDate: booking.CheckIn, checkOutDate: booking.CheckOut });
-    } else if (!fromBookings) {
-      setDebug({ source: "HotelDetails", hotel, room });
     }
-  }, [fromBookings, booking, hotel, room]);
+  }, [fromBookings, booking]);
 
   useEffect(() => {
     if (!fromBookings && (!hotel || !room)) {
@@ -95,15 +101,18 @@ useEffect(() => {
     }
   }, [hotel, room, navigate, fromBookings]);
 
-  const calculateNights = () => {
+  //useMemo caches the result and don't recalculate unless the dependancy array variables changes
+  const nights = useMemo(() => {
     if (!checkInDate || !checkOutDate) return 0;
+
     const start = new Date(checkInDate);
     const end = new Date(checkOutDate);
-    return Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-  };
 
-  const nights = calculateNights();
+    return Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+  }, [checkInDate, checkOutDate]);
+
   const roomPrice = room?.price || 0;
+  const isProceedDisabled = loading || ((!availability.datesValid || !availability.canProceed) && booking?.status !== "PENDING");
   
   // Calculate total price based on the flow
   let totalPrice = 0;
@@ -148,10 +157,6 @@ useEffect(() => {
         };
 
         const bookingRes = await createBooking(bookingPayload);
-        const bookingId = bookingRes.data?.bookingID;
-        const checkIn = bookingRes.data?.CheckIn ;
-        const checkOut = bookingRes.data?.CheckOut ;
-        totalPrice = nights * roomPrice;
 
       navigate("/stripe-checkout", {
         state: {
@@ -160,11 +165,6 @@ useEffect(() => {
         });
       }
     } catch (err) {
-      // console.error("FULL ERROR:", err);
-      // console.error("Response:", err.response);
-      // console.error("Data:", err.response?.data);
-      // console.error("Status:", err.response?.status);
-
       setError(
         err?.response?.data?.message ||
         "Failed to create booking"
@@ -283,25 +283,24 @@ useEffect(() => {
           {(booking==null || (booking?.status && booking?.status === "PENDING")) && (
           <button
             onClick={handleCreateBooking}
-            disabled={(loading || !ValidWindow || !EmptyWindow) && booking?.status !== "PENDING"}
+            disabled={isProceedDisabled}
             style={{
               ...styles.button,
               opacity: loading ? 0.7 : 1,
             }}
           >
-            {loading ? "Processing..." : fromBookings ? "Proceed to Payment" : "Proceed to Payment"}
+            {loading ? "Processing..." : "Proceed to Payment"}
           </button>
           )}
 
-          {(checkInDate && checkOutDate && !ValidWindow && (booking?.status !== "CONFIRMED" && booking?.status !== "CANCELLED") && (
+          {(checkInDate && checkOutDate && !availability.datesValid && (booking?.status !== "CONFIRMED" && booking?.status !== "CANCELLED")) && (
             <div style={{ marginTop: 16, color: "#ef4444", fontWeight: "500" }}>
-              Check-out date must be after check-in date.
-              Dates must be in the future.
+              {availability.message}
             </div>
-          ))}
-          {(ValidityJustification && ValidWindow) && (
-            <div style={{ marginBottom: 16,marginTop: 16, color: EmptyWindow ? "#10b981" : "#ef4444", fontWeight: "500" }}>
-              {ValidityJustification}
+          )}
+          {availability.message && availability.datesValid && (
+            <div style={{ marginBottom: 16, marginTop: 16, color: availability.canProceed ? "#10b981" : "#ef4444", fontWeight: "500" }}>
+              {availability.message}
             </div>
           )}
         </div>
@@ -309,12 +308,12 @@ useEffect(() => {
       </div>
 
       {/* Debug panel - shown when debug info exists */}
-      {debug && (
+      {/* {debug && (
         <div style={{ marginTop: 20 }}>
           <h3 style={{ marginBottom: 8 }}>Debug info</h3>
           <pre style={{ background: '#f8fafc', padding: 12, borderRadius: 8, overflowX: 'auto' }}>{JSON.stringify(debug, null, 2)}</pre>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

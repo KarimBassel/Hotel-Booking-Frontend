@@ -37,17 +37,6 @@ export default async function globalSetup() {
   await expect(page.getByTestId("register-meta")).toContainText('Account created.');
 
 
-  // try{
-  //   // Create past booking for review tests
-  //   const response = await fetch(
-  //     `${process.env.VITE_BACKEND_URL}/api/test/addpastbooking`,
-  //     {method : "GET"}
-  //   );
-  // }catch (error) {
-  //   console.error("Error creating past booking:", error);
-  // }
-
-
 
   await browser.close();
 }

@@ -13,7 +13,6 @@ export const updateHotelReview = (payload) =>
 export const getHotelReviews = (hotelId) => {
     return api.get(`/api/reviews/hotel/${hotelId}`);
 }
-
 export const getUserReviews = () => {
     return api.get("/api/reviews/me", { withCredentials: true });
 }

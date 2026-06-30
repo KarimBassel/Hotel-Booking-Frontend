@@ -10,6 +10,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { createPaymentIntent } from "../api/payment";
 
+
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const CheckoutForm = () => {
@@ -24,7 +25,6 @@ const CheckoutForm = () => {
   const checkInDate = booking?.checkIn;
   const checkOutDate = booking?.checkOut;
   const nights =
-    booking?.numberOfNights ||
     (checkInDate && checkOutDate
       ? Math.ceil(
           (new Date(checkOutDate) - new Date(checkInDate)) /
@@ -40,10 +40,8 @@ const CheckoutForm = () => {
 
   // Redirect if missing data
   useEffect(() => {
-    console.log("Checkout state:", location.state);
 
     if (!bookingId || !totalPrice) {
-      console.warn("Missing booking data, redirecting...");
       navigate("/hotels");
     }
   }, [bookingId, totalPrice, navigate, location.state]);
@@ -57,7 +55,6 @@ const CheckoutForm = () => {
     setLoading(true);
 
     try {
-      //const clientSecret = await createPaymentIntent(totalPrice);
       const payload = {
         BookingID: bookingId,
         Amount: totalPrice,
@@ -67,6 +64,7 @@ const CheckoutForm = () => {
       const cardElement = elements.getElement(CardElement);
 
       //Stripe hits confirm endpoint using a webhook
+      //this endpoints update booking & payment status to CONFIRMED
       const result = await stripe.confirmCardPayment(clientSecret, {
       payment_method: {
         card: cardElement,
@@ -98,25 +96,6 @@ const CheckoutForm = () => {
 
 
       }
-
-      // if (result.error) {
-      //   setError(result.error.message);
-      // } else if (result.paymentIntent?.status === "succeeded") {
-      //   setSuccess(true);
-
-      //   // try {
-      //   //   const payload = {
-      //   //     status: "CONFIRMED",
-      //   //   }
-      //   //   await updateBooking(bookingId, payload);
-      //   // } catch (err) {
-      //   //   console.error("Failed to update booking:", err);
-      //   // }
-
-      //   setTimeout(() => {
-      //     navigate("/bookings");
-      //   }, 2000);
-      // }
     } catch (err) {
       console.error(err);
       setError(err.message || "Payment failed");
@@ -171,7 +150,7 @@ const CheckoutForm = () => {
 
           {success && (
             <div style={styles.success}>
-              ✓ Payment successful! Redirecting...
+              Payment successful! Redirecting...
             </div>
           )}
 

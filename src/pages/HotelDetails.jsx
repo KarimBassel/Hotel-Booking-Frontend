@@ -36,14 +36,16 @@ const HotelDetails = () => {
       setError("");
 
       try {
-        const hotelRes = await getHotelById(id);
+        const [hotelRes, reviewRes] =await Promise.all([getHotelById(id),getHotelReviews(id)]);
         setHotel(hotelRes.data);
-
-        const reviewRes = await getHotelReviews(id);
         setReviews(reviewRes.data || []);
+
       } catch (err) {
-        console.error(err);
-        setError("Could not load hotel details.");
+        //expose message written by global excepton handler at backend
+        setError(
+            err.response?.data?.message ??
+            "Unable to load hotel details."
+          );
       } finally {
         setLoading(false);
       }
@@ -65,12 +67,6 @@ const HotelDetails = () => {
 
   return (
     <div style={styles.container}>
-      <button
-        onClick={() => navigate(-1)}
-        style={styles.backButton}
-      >
-        ← Back
-      </button>
 
       {/* ================= HOTEL HEADER ================= */}
       <div style={styles.header}>

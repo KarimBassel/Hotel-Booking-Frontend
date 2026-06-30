@@ -3,17 +3,16 @@ import { CreateReview, updateHotelReview } from "../api/reviewApi";
 import { useEffect, useState } from "react";
 
 const ReviewVisit = () => {
-  // gives access to data passed from previous page
   const location = useLocation();
-  //User navigation from this page to another page
   const navigate = useNavigate();
-  //Passed data
+
   const booking = location.state?.booking;
   const existingReview = location.state?.review || null;
 
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
-
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (existingReview) {
@@ -22,69 +21,51 @@ const ReviewVisit = () => {
     }
   }, [existingReview]);
 
-
   const isFormValid = () => {
     if (rating === 0) {
-      alert("Please select a rating");
+      setError("Please select a rating.");
       return false;
     }
+
     return true;
   };
 
+  const handleSubmit = async () => {
+    setError("");
 
-const handleSubmit = async () => {
-  if (!isFormValid()) return;
+    if (!isFormValid()) return;
 
-  try {
-    console.log("=== REVIEW SUBMISSION START ===");
-    console.log("existingReview:", existingReview);
-    console.log("booking:", booking);
-    console.log("rating:", rating);
-    console.log("comment:", comment);
+    setSubmitting(true);
 
-    if (existingReview) {
-      const payload = {
-        reviewID: existingReview?.id,
-        rating,
-        comment,
-      };
+    try {
+      if (existingReview) {
+        const payload = {
+          reviewID: existingReview.id,
+          rating,
+          comment,
+        };
 
-      console.log("Updating review with payload:", payload);
+        await updateHotelReview(payload);
+      } else {
+        const payload = {
+          hotelID: booking.HotelID,
+          rating,
+          comment,
+        };
 
-      const response = await updateHotelReview(payload);
+        await CreateReview(payload);
+      }
 
-      console.log("Update review response:", response);
-      console.log("Review updated successfully");
-    } else {
-      const payload = {
-        hotelID: booking?.HotelID,
-        rating,
-        comment,
-      };
-
-      console.log("Creating review with payload:", payload);
-
-      const response = await CreateReview(payload);
-
-      console.log("Create review response:", response);
-      console.log("Review created successfully");
+      navigate("/bookings");
+    } catch (err) {
+      setError(
+        err?.response?.data?.message ||
+          "Failed to submit review. Please try again."
+      );
+    } finally {
+      setSubmitting(false);
     }
-
-    console.log("Navigating to /bookings");
-    navigate("/bookings");
-
-  } catch (err) {
-    console.error("=== REVIEW ERROR ===");
-    console.error("Error object:", err);
-    console.error("Error response:", err?.response);
-    console.error("Error status:", err?.response?.status);
-    console.error("Error data:", err?.response?.data);
-
-    alert("Failed to submit review");
-  }
-};
-
-
+  };
 
   const renderStars = () => {
     return [1, 2, 3, 4, 5].map((star) => (
@@ -95,29 +76,23 @@ const handleSubmit = async () => {
           cursor: "pointer",
           color: star <= rating ? "#ca8a04" : "#d1d5db",
         }}
-        onClick={() => setRating(star)}
+        onClick={() => {
+          setRating(star);
+          setError("");
+        }}
       >
         ★
       </span>
     ));
   };
 
-
   if (!booking) {
-    return (
-      <p style={styles.center}>
-        No booking selected.
-      </p>
-    );
+    return <p style={styles.center}>No booking selected.</p>;
   }
-
-
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>
-        Review Your Visit
-      </h1>
+      <h1 style={styles.title}>Review Your Visit</h1>
 
       {/* BOOKING INFO */}
       <div style={styles.card}>
@@ -144,13 +119,11 @@ const handleSubmit = async () => {
           <h3>Existing Review</h3>
 
           <p>
-            <b>Rating:</b>{" "}
-            {existingReview.review}/5
+            <b>Rating:</b> {existingReview.review}/5
           </p>
 
           <p>
-            <b>Comment:</b>{" "}
-            {existingReview.comment}
+            <b>Comment:</b> {existingReview.comment}
           </p>
         </div>
       )}
@@ -158,13 +131,10 @@ const handleSubmit = async () => {
       {/* STARS */}
       <div style={styles.card}>
         <h3>Rate your stay</h3>
-        <div style={styles.stars}>
-          {renderStars()}
-        </div>
 
-        <p>
-          Rating: {rating || "Not selected"}
-        </p>
+        <div style={styles.stars}>{renderStars()}</div>
+
+        <p>Rating: {rating || "Not selected"}</p>
       </div>
 
       {/* COMMENT */}
@@ -173,27 +143,30 @@ const handleSubmit = async () => {
 
         <textarea
           value={comment}
-          onChange={(e) =>
-            setComment(e.target.value)
-          }
+          onChange={(e) => setComment(e.target.value)}
           placeholder="Tell us about your experience..."
           style={styles.textarea}
         />
       </div>
 
+      {/* ERROR */}
+      {error && <div style={styles.error}>{error}</div>}
+
       {/* SUBMIT */}
       <button
         style={styles.button}
         onClick={handleSubmit}
+        disabled={submitting}
       >
-        {existingReview
+        {submitting
+          ? "Submitting..."
+          : existingReview
           ? "Update Review"
           : "Submit Review"}
       </button>
     </div>
   );
 };
-
 
 const styles = {
   container: {
@@ -233,6 +206,16 @@ const styles = {
     marginTop: 10,
   },
 
+  error: {
+    marginBottom: 15,
+    padding: 12,
+    borderRadius: 8,
+    background: "#fee2e2",
+    color: "#b91c1c",
+    border: "1px solid #fecaca",
+    textAlign: "center",
+  },
+
   button: {
     width: "100%",
     padding: 12,
@@ -243,6 +226,7 @@ const styles = {
     cursor: "pointer",
     fontSize: 16,
     fontWeight: "bold",
+    opacity: 1,
   },
 };
 

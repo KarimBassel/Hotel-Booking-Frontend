@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { getProfile,updateProfile } from "../api/userApi";
+import { getProfile, updateProfile } from "../api/userApi";
 import { uploadImage, deleteImage } from "../api/CloudinaryApi";
-import api from "../api/axios";
 
 const Profile = () => {
   const [form, setForm] = useState({
@@ -14,16 +13,17 @@ const Profile = () => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
-  const [message, setMessage] = useState("");
-  const [debug, setDebug] = useState(null);
 
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
-      try {
-        const res = await getProfile();
+      setError("");
 
-        const data = res.data;
+      try {
+        const response = await getProfile();
+        const data = response.data;
 
         setForm({
           name: data.name || "",
@@ -31,11 +31,14 @@ const Profile = () => {
           phoneNumber: data.phoneNumber || "",
           imageURL: data.imageURL || data.ImageURL || "",
         });
-
-        setDebug({ rawResponse: data });
       } catch (err) {
         console.error(err);
-        setDebug({ error: err?.response?.data || err.message });
+
+        const message =
+          err.response?.data?.message ||
+          "Failed to load your profile";
+
+        setError(message);
       } finally {
         setLoading(false);
       }
@@ -44,38 +47,35 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
-
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
- 
   const uploadImageIfNew = async () => {
-    const isNewImageSelected = !!file;
-
-    if (!isNewImageSelected) return form.imageURL;
+    if (!file) return form.imageURL;
 
     try {
-      const oldImageURL = form.imageURL;
-
-      if (oldImageURL) {
-        await deleteImage(oldImageURL);
+      if (form.imageURL) {
+        await deleteImage(form.imageURL);
       }
 
       const response = await uploadImage(file);
 
+      const newUrl = response.imageURL;
+
       setForm((prev) => ({
         ...prev,
-        imageURL: response.imageURL,
+        imageURL: newUrl,
       }));
 
-      return response.imageURL;
+      return newUrl;
     } catch (err) {
       console.error(err);
-      setDebug((prev) => ({
-        ...prev,
-        imageUploadError: err?.response?.data || err.message,
-      }));
+
+      setError(
+        err.response?.data?.message ||
+        "Image upload failed. Please try again."
+      );
 
       return form.imageURL;
     }
@@ -83,7 +83,8 @@ const Profile = () => {
 
   const handleUpdate = async () => {
     setUpdating(true);
-    setMessage("");
+    setError("");
+    setSuccess("");
 
     try {
       const imageURL = await uploadImageIfNew();
@@ -93,108 +94,111 @@ const Profile = () => {
         imageURL,
       };
 
-      const res = await updateProfile(payload);
+      await updateProfile(payload);
 
       setForm(payload);
       setFile(null);
 
-      setMessage("Profile updated successfully");
-
-      setDebug((prev) => ({
-        ...prev,
-        updateResponse: res.data,
-      }));
+      setSuccess("Profile updated successfully");
     } catch (err) {
       console.error(err);
-      setMessage("Update failed");
 
-      setDebug((prev) => ({
-        ...prev,
-        error: err?.response?.data || err.message,
-      }));
+      setError(
+        err.response?.data?.message ||
+        "Update failed"
+      );
+    } finally {
+      setUpdating(false);
     }
-
-    setUpdating(false);
   };
 
   if (loading) return <div>Loading...</div>;
+  if (error) {
+    return (
+      <div style={styles.errorPage}>
+        <div style={styles.error}>
+          {error}
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div style={styles.container}>
-      <div style={styles.card}>
-        
-        {/* PROFILE IMAGE */}
-        <img
-          src={
-            form.imageURL ||
-            `https://ui-avatars.com/api/?name=${form.name}`
-          }
-          alt="profile"
-          style={styles.image}
-        />
 
-        {/* CENTERED FILE INPUT */}
-        <div style={styles.fileInputContainer}>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setFile(e.target.files[0])}
-            style={styles.fileInput}
+        <div style={styles.card}>
+
+          {/* PROFILE IMAGE */}
+          <img
+            src={
+              form.imageURL ||
+              `https://ui-avatars.com/api/?name=${form.name}`
+            }
+            alt="profile"
+            style={styles.image}
           />
+
+          {/* FILE INPUT */}
+          <div style={styles.fileInputContainer}>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                setFile(e.target.files[0])
+              }
+              style={styles.fileInput}
+            />
+          </div>
+
+          {/* NAME */}
+          <input
+            type="text"
+            name="name"
+            data-testid="name-input"
+            value={form.name}
+            onChange={handleChange}
+            placeholder="Name"
+            style={styles.input}
+          />
+
+          {/* EMAIL */}
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="Email"
+            style={styles.input}
+          />
+
+          {/* PHONE */}
+          <input
+            type="text"
+            name="phoneNumber"
+            value={form.phoneNumber}
+            onChange={handleChange}
+            placeholder="Phone Number"
+            style={styles.input}
+          />
+
+          {/* SUCCESS MESSAGE ONLY */}
+          {success && (
+            <div style={styles.message} data-testid="profile-message">
+              {success}
+            </div>
+          )}
+
+          {/* BUTTON */}
+          <button
+            onClick={handleUpdate}
+            disabled={updating}
+            style={styles.button}
+          >
+            {updating ? "Updating..." : "Update Profile"}
+          </button>
+
         </div>
-
-        {/* NAME */}
-        <input
-          type="text"
-          name="name"
-          value={form.name}
-          data-testid="name-input"
-          onChange={handleChange}
-          placeholder="Name"
-          style={styles.input}
-        />
-
-        {/* EMAIL */}
-        <input
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          placeholder="Email"
-          style={styles.input}
-        />
-
-        {/* PHONE */}
-        <input
-          type="text"
-          name="phoneNumber"
-          value={form.phoneNumber}
-          onChange={handleChange}
-          placeholder="Phone Number"
-          style={styles.input}
-        />
-
-        {/* MESSAGE */}
-        {message && <div style={styles.message} data-testid="profile-message">{message}</div>}
-
-        {/* UPDATE BUTTON */}
-        <button
-          onClick={handleUpdate}
-          disabled={updating}
-          style={styles.button}
-        >
-          {updating ? "Updating..." : "Update Profile"}
-        </button>
-
-        {/* DEBUG */}
-        <div style={styles.debugBox}>
-          <h3>Debug</h3>
-          <pre style={styles.debugText}>
-            {JSON.stringify(debug, null, 2)}
-          </pre>
-        </div>
-
-      </div>
     </div>
   );
 };
@@ -265,17 +269,20 @@ const styles = {
     color: "#16a34a",
     textAlign: "center",
   },
-
-  debugBox: {
-    marginTop: 20,
+    error: {
+    marginBottom: 15,
     padding: 12,
-    background: "#0f172a",
-    color: "#e2e8f0",
-    borderRadius: 10,
-    fontSize: 12,
+    borderRadius: 8,
+    background: "#fee2e2",
+    color: "#b91c1c",
+    border: "1px solid #fecaca",
+    textAlign: "center",
   },
-
-  debugText: {
-    whiteSpace: "pre-wrap",
-  },
+errorPage: {
+  minHeight: "100vh",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  background: "#f1f5f9",
+},
 };

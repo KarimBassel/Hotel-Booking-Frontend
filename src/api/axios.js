@@ -1,7 +1,6 @@
 import axios from "axios";
 
 const api = axios.create({
-  //baseURL: "https://hotel-booking-backend-production-dc0d.up.railway.app",
   //environment variable set in .env files, accessed via import.meta.env in Vite
   //retrieved via import.env because inside browser context
   baseURL: import.meta.env.VITE_BACKEND_URL,
