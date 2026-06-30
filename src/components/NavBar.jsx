@@ -95,13 +95,15 @@ const NavBar = () => {
 
       {isMobile ? (
         <>
-          <button
-            style={styles.menuButton}
-            onClick={() => setMenuOpen((prev) => !prev)}
-            aria-label="Toggle menu"
-          >
-            ☰
-          </button>
+          <div style={styles.mobileControls}>
+            <button
+              style={styles.menuButton}
+              onClick={() => setMenuOpen((prev) => !prev)}
+              aria-label="Toggle menu"
+            >
+              ☰
+            </button>
+          </div>
           {menuOpen && (
             <div style={styles.mobileMenu}>
               {renderLinks()}
@@ -132,6 +134,7 @@ const styles = {
     gap: "0.5rem",
     width: "100%",
     overflowX: "hidden",
+    overflowY: "visible",
     boxSizing: "border-box",
   },
 
@@ -166,6 +169,12 @@ const styles = {
     marginLeft: "auto",
   },
 
+  mobileControls: {
+    display: "flex",
+    alignItems: "center",
+    marginLeft: "auto",
+  },
+
   menuButton: {
     background: "transparent",
     border: "2px solid #facc15",
@@ -175,21 +184,24 @@ const styles = {
     cursor: "pointer",
     fontSize: "1.2rem",
     fontWeight: "700",
+    zIndex: 170,
   },
 
   mobileMenu: {
-    position: "absolute",
+    position: "fixed",
     top: "70px",
-    right: "16px",
-    left: "16px",
+    left: 0,
+    right: 0,
+    width: "100%",
     backgroundColor: "#1f3d8a",
-    borderRadius: "14px",
+    borderRadius: "0 0 14px 14px",
     padding: "16px",
     display: "flex",
     flexDirection: "column",
     gap: "10px",
     boxShadow: "0 12px 30px rgba(0,0,0,0.25)",
-    zIndex: 150,
+    zIndex: 160,
+    boxSizing: "border-box",
   },
 
   mobileOverlay: {
