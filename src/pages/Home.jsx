@@ -93,6 +93,8 @@ const styles = {
   root: {
     minHeight: "100dvh",
     width: "100%",
+    maxWidth: "100%",
+    overflowX: "hidden",
     backgroundColor: "#f8f9fa",
   },
   hero: {

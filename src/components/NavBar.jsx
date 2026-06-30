@@ -130,6 +130,9 @@ const styles = {
     boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
     flexWrap: "wrap",
     gap: "0.5rem",
+    width: "100%",
+    overflowX: "hidden",
+    boxSizing: "border-box",
   },
 
   logoContainer: {
